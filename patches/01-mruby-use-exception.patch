@@ -1,0 +1,273 @@
+diff --git a/include/mruby.h b/include/mruby.h
+index 4a5b5ce..f9a697c 100644
+--- a/include/mruby.h
++++ b/include/mruby.h
+@@ -348,6 +348,50 @@ void* mrb_pool_realloc(struct mrb_pool*, void*, size_t oldlen, size_t newlen);
+ int mrb_pool_can_realloc(struct mrb_pool*, void*, size_t);
+ void* mrb_alloca(mrb_state *mrb, size_t);
+ 
++#if defined(__cplusplus) && defined(MRB_USE_EXCEPTION)
++typedef size_t mrb_jmp_buf[2];
++#define GET_JMP_ID(j) (*((size_t*) (j)))
++#define GET_JMP_RET(j) (*(((size_t*) (j)) + 1))
++#define SET_JMP_ID(j, v) GET_JMP_ID(j) = (size_t) (v)
++#define SET_JMP_RET(j, v) GET_JMP_RET(j) = (size_t) (v)
++
++/*
++ * Simple try...catch block
++ */
++#define MRB_TRY_BLOCK(j) SET_JMP_ID(j, &(j));SET_JMP_RET(j, 0); try {
++#define MRB_TRY_CATCH(j) } catch (mrb_jmp_buf catched_jmp_buf) { \
++  if (GET_JMP_ID(catched_jmp_buf) == GET_JMP_ID(j)) {
++#define MRB_TRY_END(j) } else { throw; } }
++
++/*
++ * try...catch block with label
++ */
++#define MRB_TRYL_BLOCK(j, retry_label, ret_value) SET_JMP_ID(j, &(j)); \
++  SET_JMP_RET(j, 0); retry_label: try { ret_value = GET_JMP_RET(j);
++#define MRB_TRYL_END(j, retry_label) } catch (mrb_jmp_buf catched_jmp_buf) { \
++  if (GET_JMP_ID(catched_jmp_buf) == GET_JMP_ID(j)) { goto retry_label;} \
++  else { throw; }}
++
++#define MRB_THROW(j, v) SET_JMP_RET(j, v); throw (j)
++
++#else
++/*
++ * This is implemented as a macro to eliminate
++ * the need to include setjmp.h here
++*/
++#define mrb_jmp_buf jmp_buf
++
++#define MRB_TRY_BLOCK(j) if (setjmp(j) == 0) {
++#define MRB_TRY_CATCH(j) } else {
++#define MRB_TRY_END(j) }
++
++#define MRB_TRYL_BLOCK(j, retry_label, ret_value) ret_value = setjmp(j);
++#define MRB_TRYL_END(j, retry_label)
++
++#define MRB_THROW(j, v) longjmp((j), (v))
++
++#endif
++
+ #if defined(__cplusplus)
+ }  /* extern "C" { */
+ #endif
+diff --git a/include/mruby/compile.h b/include/mruby/compile.h
+index e035b9e..a27e73f 100644
+--- a/include/mruby/compile.h
++++ b/include/mruby/compile.h
+@@ -96,7 +96,7 @@ struct mrb_parser_state {
+   struct mrb_parser_message error_buffer[10];
+   struct mrb_parser_message warn_buffer[10];
+ 
+-  jmp_buf jmp;
++  mrb_jmp_buf jmp;
+ };
+ 
+ struct mrb_parser_state* mrb_parser_new(mrb_state*);
+diff --git a/src/codegen.c b/src/codegen.c
+index 82e80ee..30e6489 100644
+--- a/src/codegen.c
++++ b/src/codegen.c
+@@ -39,7 +39,7 @@ struct loopinfo {
+ typedef struct scope {
+   mrb_state *mrb;
+   mrb_pool *mpool;
+-  jmp_buf jmp;
++  mrb_jmp_buf jmp;
+ 
+   struct scope *prev;
+ 
+@@ -102,7 +102,7 @@ codegen_error(codegen_scope *s, const char *message)
+     fprintf(stderr, "codegen error: %s\n", message);
+   }
+ #endif
+-  longjmp(s->jmp, 1);
++  MRB_THROW(s->jmp, 1);
+ }
+ 
+ static void*
+@@ -2534,13 +2534,20 @@ codegen_start(mrb_state *mrb, parser_state *p)
+   if (p->filename) {
+     scope->filename = p->filename;
+   }
+-  if (setjmp(scope->jmp) != 0) {
+-    return -1;
+-  }
++
++  MRB_TRY_BLOCK(scope->jmp);
++
+   // prepare irep
+   codegen(scope, p->tree, NOVAL);
+   mrb_pool_close(scope->mpool);
+   return 0;
++
++  MRB_TRY_CATCH(scope->jmp);
++
++  /* catches the right exception */
++  return -1;
++
++  MRB_TRY_END(scope->jmp);
+ }
+ 
+ int
+diff --git a/src/error.c b/src/error.c
+index 430728d..12345ed 100644
+--- a/src/error.c
++++ b/src/error.c
+@@ -214,7 +214,7 @@ mrb_exc_raise(mrb_state *mrb, mrb_value exc)
+   if (!mrb->jmp) {
+     abort();
+   }
+-  longjmp(*(jmp_buf*)mrb->jmp, 1);
++  MRB_THROW(*(mrb_jmp_buf*)mrb->jmp, 1);
+ }
+ 
+ void
+diff --git a/src/gc.c b/src/gc.c
+index 374072c..3ee5da1 100644
+--- a/src/gc.c
++++ b/src/gc.c
+@@ -325,7 +325,7 @@ struct RBasic*
+ mrb_obj_alloc(mrb_state *mrb, enum mrb_vtype ttype, struct RClass *cls)
+ {
+   struct RBasic *p;
+-  static const RVALUE RVALUE_zero = { { { 0 } } };
++  static const RVALUE RVALUE_zero = { { { MRB_TT_FALSE } } };
+ 
+ #ifdef MRB_GC_STRESS
+   mrb_garbage_collect(mrb);
+diff --git a/src/parse.y b/src/parse.y
+index abec59e..e1f54f9 100644
+--- a/src/parse.y
++++ b/src/parse.y
+@@ -82,7 +82,7 @@ parser_palloc(parser_state *p, size_t size)
+   void *m = mrb_pool_alloc(p->pool, size);
+ 
+   if (!m) {
+-    longjmp(p->jmp, 1);
++    MRB_THROW(p->jmp, 1);
+   }
+   return m;
+ }
+@@ -4722,12 +4722,7 @@ void parser_dump(mrb_state *mrb, node *tree, int offset);
+ void
+ mrb_parser_parse(parser_state *p, mrbc_context *c)
+ {
+-  if (setjmp(p->jmp) != 0) {
+-    yyerror(p, "memory allocation error");
+-    p->nerr++;
+-    p->tree = 0;
+-    return;
+-  }
++  MRB_TRY_BLOCK(p->jmp);
+ 
+   p->cmd_start = TRUE;
+   p->in_def = p->in_single = FALSE;
+@@ -4743,6 +4738,15 @@ mrb_parser_parse(parser_state *p, mrbc_context *c)
+   if (c && c->dump_result) {
+     parser_dump(p->mrb, p->tree, 0);
+   }
++
++  MRB_TRY_CATCH(p->jmp);
++
++  yyerror(p, "memory allocation error");
++  p->nerr++;
++  p->tree = 0;
++  return;
++
++  MRB_TRY_END(p->jmp);
+ }
+ 
+ parser_state*
+diff --git a/src/state.c b/src/state.c
+index 8bd222f..db31d70 100644
+--- a/src/state.c
++++ b/src/state.c
+@@ -53,7 +53,7 @@ mrb_alloca(mrb_state *mrb, size_t size)
+ {
+   struct alloca_header *p;
+ 
+-  p = mrb_malloc(mrb, sizeof(struct alloca_header)+size);
++  p = (struct alloca_header*) mrb_malloc(mrb, sizeof(struct alloca_header)+size);
+   p->next = mrb->mems;
+   mrb->mems = p;
+   return (void*)p->buf;
+diff --git a/src/vm.c b/src/vm.c
+index b5bde89..f4e5149 100644
+--- a/src/vm.c
++++ b/src/vm.c
+@@ -260,17 +260,23 @@ mrb_funcall_with_block(mrb_state *mrb, mrb_value self, mrb_sym mid, int argc, mr
+   mrb_value val;
+ 
+   if (!mrb->jmp) {
+-    jmp_buf c_jmp;
++    mrb_jmp_buf c_jmp;
++
++    MRB_TRY_BLOCK(c_jmp);
+ 
+-    if (setjmp(c_jmp) != 0) {	/* error */
+-      mrb->jmp = 0;
+-      return mrb_nil_value();
+-    }
+     mrb->jmp = &c_jmp;
+     /* recursive call */
+     val = mrb_funcall_with_block(mrb, self, mid, argc, argv, blk);
+     mrb->jmp = 0;
+     return val;
++
++    MRB_TRY_CATCH(c_jmp);
++
++    /* error */
++    mrb->jmp = 0;
++    return mrb_nil_value();
++
++    MRB_TRY_END(c_jmp);
+   }
+ 
+   if (!mrb->stack) {
+@@ -464,8 +470,9 @@ mrb_run(mrb_state *mrb, struct RProc *proc, mrb_value self)
+   mrb_value *regs = NULL;
+   mrb_code i;
+   int ai = mrb->arena_idx;
+-  jmp_buf *prev_jmp = (jmp_buf *)mrb->jmp;
+-  jmp_buf c_jmp;
++  mrb_jmp_buf *prev_jmp = (mrb_jmp_buf *)mrb->jmp;
++  mrb_jmp_buf c_jmp;
++  int jmp_ret;
+ 
+ #ifdef DIRECT_THREADED
+   static void *optable[] = {
+@@ -493,12 +500,13 @@ mrb_run(mrb_state *mrb, struct RProc *proc, mrb_value self)
+ #endif
+ 
+ 
+-  if (setjmp(c_jmp) == 0) {
++  MRB_TRYL_BLOCK(c_jmp, L_SETJMP, jmp_ret);
++  if (jmp_ret == 0) {
+     mrb->jmp = &c_jmp;
+-  }
+-  else {
++  } else {
+     goto L_RAISE;
+   }
++
+   if (!mrb->stack) {
+     stack_init(mrb);
+   }
+@@ -1111,7 +1119,7 @@ mrb_run(mrb_state *mrb, struct RProc *proc, mrb_value self)
+           ci = mrb->ci;
+ 	  if (ci[1].acc < 0 && prev_jmp) {
+ 	    mrb->jmp = prev_jmp;
+-	    longjmp(*(jmp_buf*)mrb->jmp, 1);
++        MRB_THROW(*(mrb_jmp_buf*)mrb->jmp, 1);
+ 	  }
+ 	  while (eidx > mrb->ci->eidx) {
+ 	    ecall(mrb, --eidx);
+@@ -1863,4 +1871,5 @@ mrb_run(mrb_state *mrb, struct RProc *proc, mrb_value self)
+     }
+   }
+   END_DISPATCH;
++  MRB_TRYL_END(c_jmp, L_SETJMP);
+ }

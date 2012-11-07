@@ -1,12 +1,13 @@
 # Makefile description.
-# build JavaScript module from mruby source code
+# Build JavaScript module from mruby source code and link
+# it against our provided source code including the main function
 # This Makefile is inspired from the mruby Makefile
 
 # compiler, linker, archiver path
 export EMSCRIPTEN_PATH = ./modules/emscripten
-export CC = $(EMSCRIPTEN_PATH)/emcc
-export LL = $(EMSCRIPTEN_PATH)/emcc
-export AR = $(EMSCRIPTEN_PATH)/emcc
+export CC = $(EMSCRIPTEN_PATH)/em++
+export LL = $(EMSCRIPTEN_PATH)/em++
+export AR = $(EMSCRIPTEN_PATH)/em++
 
 # TODO: Due to the different compiler/linker/archiver options,
 # now we leave to mruby itself to generate src/y.tab.c and
@@ -15,25 +16,36 @@ export AR = $(EMSCRIPTEN_PATH)/emcc
 # temporary files and may be removed when build is finished in later
 # versions of mruby. We will come back to this later.
 
-# project-specific macros
+# mruby settings
 MRUBY_PATH := ./modules/mruby
 MRBLIB_PATH := $(MRUBY_PATH)/mrblib
 
-SRCDIR := $(MRUBY_PATH)/src
-BUILDDIR := ./build
+MRUBY_SRC_DIR := $(MRUBY_PATH)/src
+MRUBY_BUILD_DIR := ./build/mruby
 
-TARGET := $(BUILDDIR)/libruby.so
-JS_TARGET := $(BUILDDIR)/libruby.js
+MRUBY_LIB := $(MRUBY_BUILD_DIR)/libruby.so
 
 MRBLIBC := $(MRBLIB_PATH)/mrblib.c
-YC := $(SRCDIR)/y.tab.c
-EXCEPT1 := $(YC) $(SRCDIR)/minimain.c
-OBJY := $(patsubst $(SRCDIR)/%.c,$(BUILDDIR)/%.o,$(YC))
-OBJ_MRBLIB := $(patsubst $(MRBLIB_PATH)/%.c,$(BUILDDIR)/%.o,$(MRBLIBC))
-OBJS := $(patsubst $(SRCDIR)/%.c,$(BUILDDIR)/%.o,$(filter-out $(EXCEPT1),$(wildcard $(SRCDIR)/*.c)))
+YC := $(MRUBY_SRC_DIR)/y.tab.c
+EXCEPT1 := $(YC) $(MRUBY_SRC_DIR)/minimain.c
+MRUBY_OBJY := $(patsubst $(MRUBY_SRC_DIR)/%.c,$(MRUBY_BUILD_DIR)/%.o,$(YC))
+MRBLIB_OBJ := $(patsubst $(MRBLIB_PATH)/%.c,$(MRUBY_BUILD_DIR)/%.o,$(MRBLIBC))
+MRUBY_OBJS := $(patsubst $(MRUBY_SRC_DIR)/%.c,$(MRUBY_BUILD_DIR)/%.o,$(filter-out $(EXCEPT1),$(wildcard $(MRUBY_SRC_DIR)/*.c)))
+
+# sources
+SRC_DIR := ./src
+BUILD_DIR := ./build
+
+PATCH_DIR := $(CURDIR)/patches
+
+OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(wildcard $(SRC_DIR)/*.c))
+
+# final js executable(or html page)
+JS_EXECUTABLE := $(BUILD_DIR)/mruby.js
+WEBPAGE := $(BUILD_DIR)/mruby.html
 
 # libraries, includes
-INCLUDES = -I$(SRCDIR) -I$(SRCDIR)/../include
+INCLUDES = -I$(MRUBY_SRC_DIR) -I$(MRUBY_SRC_DIR)/../include
 
 ifeq ($(strip $(COMPILE_MODE)),)
   # default compile option
@@ -49,38 +61,47 @@ else ifeq ($(COMPILE_MODE),small)
   JSFLAGS = -Os
 endif
 
-ALL_CFLAGS = -Wall -Werror-implicit-function-declaration $(CFLAGS)
-
+ALL_CFLAGS = -DMRB_USE_EXCEPTION \
+	-x c++ \
+	-Wno-write-strings \
+	-Werror-implicit-function-declaration \
+	$(CFLAGS)
 
 ##############################
 # generic build targets, rules
 
 .PHONY : all
-all : $(JS_TARGET)
+all : js
 
-$(JS_TARGET) : $(TARGET)
-	$(CC) $(JSFLAGS) $< -o $@
+js : $(JS_EXECUTABLE)
+
+$(JS_EXECUTABLE) : $(MRUBY_LIB) $(OBJS)
+	$(CC) $(ALL_CFLAGS) $(MRUBY_LIB) $(OBJS) -o $@
+
+webpage : $(MRUBY_LIB) $(OBJS)
+	$(CC) $(ALL_CFLAGS) $(MRUBY_LIB) $(OBJS) -o $(WEBPAGE)
+
+# TODO: .d files handling
+$(BUILD_DIR)/%.o : $(SRC_DIR)/%.c
+	$(CC) $(ALL_CFLAGS) -MMD $(INCLUDES) -c $< -o $@
 
 # shared library, we create a .so file instead of .a due to emscripten's
 # recommendations
-$(TARGET) : $(OBJS) $(OBJY) $(OBJ_MRBLIB)
-	$(CC) -shared -o $@ $(OBJS) $(OBJY) $(OBJ_MRBLIB)
-
-# TODO: fix this later, currently .o files and .d files are not in the
-# same directory
-# -include $(OBJS:.o=.d) $(OBJY:.o=.d)
+$(MRUBY_LIB) : $(MRUBY_OBJS) $(MRUBY_OBJY) $(MRBLIB_OBJ)
+	$(CC) -shared -o $@ $(MRUBY_OBJS) $(MRUBY_OBJY) $(MRBLIB_OBJ)
 
 # objects compiled from source
-$(BUILDDIR)/%.o : $(SRCDIR)/%.c
+# TODO: include dependencies for .d files
+$(MRUBY_BUILD_DIR)/%.o : $(MRUBY_SRC_DIR)/%.c
 	$(CC) $(ALL_CFLAGS) -MMD $(INCLUDES) -c $< -o $@
 
 # parser compile
-$(OBJY) : $(YC)
-	$(CC) $(ALL_CFLAGS) -MMD $(INCLUDES) -c $(YC) -o $(OBJY)
+$(MRUBY_OBJY) : $(YC)
+	$(CC) $(ALL_CFLAGS) -MMD $(INCLUDES) -c $(YC) -o $(MRUBY_OBJY)
 
 # mruby library compile
-$(OBJ_MRBLIB): $(MRBLIBC)
-	$(CC) $(ALL_CFLAGS) -MMD $(INCLUDES) -c $(MRBLIBC) -o $(OBJ_MRBLIB)
+$(MRBLIB_OBJ): $(MRBLIBC)
+	$(CC) $(ALL_CFLAGS) -MMD $(INCLUDES) -c $(MRBLIBC) -o $(MRBLIB_OBJ)
 
 # yacc compile
 $(YC) :
@@ -90,7 +111,12 @@ $(YC) :
 $(MRBLIBC) :
 	@(cd $(MRUBY_PATH); make)
 
+# apply patches to mruby
+applypatch :
+	@(cd $(MRUBY_PATH) && git reset --hard && git apply $(PATCH_DIR)/*.patch && make clean)
+
 # clean up
-.PHONY : clean #cleandep
+.PHONY : clean
 clean :
-	rm -f $(OBJS) $(OBJY) $(OBJ_MRBLIB) $(TARGET) $(JS_TARGET)
+	rm -f $(MRUBY_OBJS) $(MRUBY_OBJY) $(MRBLIB_OBJ) $(MRUBY_LIB)
+	rm -rf $(JS_EXECUTABLE) $(WEBPAGE) $(OBJS)
