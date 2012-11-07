@@ -1,3 +1,10 @@
+/*
+** main.c - entrypoint for the mruby experiment in the browser
+**
+** This source code is take from
+** http://geekmonkey.org/articles/36-an-introduction-to-mini-ruby.
+** The copyright belongs to the original author, Fabian Becker.
+*/
 #include <stdlib.h>
 #include <stdio.h>
 
