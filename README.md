@@ -13,10 +13,7 @@ belongs to the original author, Fabian Becker.
 # How to use this
 
     $ git clone git://github.com/xxuejie/mruby-browser.git
-    $ git submodule init
-    $ git submodule update
-    $ make applypatch
-    $ make
+    $ ./scripts/bootstrap
     $ node build/mruby.js
     Ruby is awesome!
     Ruby is awesome!
@@ -24,9 +21,7 @@ belongs to the original author, Fabian Becker.
     Ruby is awesome!
     Ruby is awesome!
 
-The `applypatch` target in Makefile applies a series of patches to the mruby source code, this only needs to be run once. After that you can simply use make to build the sources as long as there are no new patches added.
-
-The default target generates a js file. You can also use the `webpage` target to generate a webpage:
+If you make changes to the source code, you can simply use `make` to rebuild it. The default target generates a js file. You can also use the `webpage` target to generate a webpage:
 
     $ make webpage
     $ open build/mruby.html

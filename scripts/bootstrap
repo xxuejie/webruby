@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Bootstrap script for mruby-browser
+
+function on_error() {
+    echo "Oops... some errors occur."
+    exit 1;
+}
+
+git submodule init
+if [ $? -ne 0 ]; then
+    on_error;
+fi
+
+git submodule update
+if [ $? -ne 0 ]; then
+    on_error;
+fi
+
+make applypatch
+if [ $? -ne 0 ]; then
+    on_error;
+fi
+
+make
+if [ $? -ne 0 ]; then
+    on_error;
+fi
+
+echo -e "\n\n##################################################"
+echo "Congratulations! The bootstrap has finished!"
+echo "If you make changes to the source code, you can simply use \"make\" to build it."
+echo "You can also use \"make webpage\" to create a html page instead of js file."
