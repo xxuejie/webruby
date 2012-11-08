@@ -61,8 +61,7 @@ else ifeq ($(COMPILE_MODE),small)
   JSFLAGS = -Os
 endif
 
-ALL_CFLAGS = -DMRB_USE_EXCEPTION \
-	-x c++ \
+ALL_CFLAGS = -x c++ \
 	-Wno-write-strings \
 	-Werror-implicit-function-declaration \
 	$(CFLAGS)
@@ -75,6 +74,8 @@ all : js
 
 js : $(JS_EXECUTABLE)
 
+# NOTE: current version of emscripten would emit an exception if we
+# use -O1 or -O2 here
 $(JS_EXECUTABLE) : $(MRUBY_LIB) $(OBJS)
 	$(CC) $(ALL_CFLAGS) $(MRUBY_LIB) $(OBJS) -o $@
 

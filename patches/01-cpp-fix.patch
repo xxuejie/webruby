@@ -1,0 +1,26 @@
+diff --git a/src/gc.c b/src/gc.c
+index 374072c..3ee5da1 100644
+--- a/src/gc.c
++++ b/src/gc.c
+@@ -325,7 +325,7 @@ struct RBasic*
+ mrb_obj_alloc(mrb_state *mrb, enum mrb_vtype ttype, struct RClass *cls)
+ {
+   struct RBasic *p;
+-  static const RVALUE RVALUE_zero = { { { 0 } } };
++  static const RVALUE RVALUE_zero = { { { MRB_TT_FALSE } } };
+ 
+ #ifdef MRB_GC_STRESS
+   mrb_garbage_collect(mrb);
+diff --git a/src/state.c b/src/state.c
+index 8bd222f..db31d70 100644
+--- a/src/state.c
++++ b/src/state.c
+@@ -53,7 +53,7 @@ mrb_alloca(mrb_state *mrb, size_t size)
+ {
+   struct alloca_header *p;
+ 
+-  p = mrb_malloc(mrb, sizeof(struct alloca_header)+size);
++  p = (struct alloca_header*) mrb_malloc(mrb, sizeof(struct alloca_header)+size);
+   p->next = mrb->mems;
+   mrb->mems = p;
+   return (void*)p->buf;
