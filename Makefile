@@ -54,7 +54,6 @@ endif
 
 ifeq ($(COMPILE_MODE),debug)
   JSFLAGS =
-  CFLAGS = -g
 else ifeq ($(COMPILE_MODE),release)
   JSFLAGS = -O2
 else ifeq ($(COMPILE_MODE),small)
@@ -63,8 +62,7 @@ endif
 
 ALL_CFLAGS = -x c++ \
 	-Wno-write-strings \
-	-Werror-implicit-function-declaration \
-	$(CFLAGS)
+	-Werror-implicit-function-declaration
 
 ##############################
 # generic build targets, rules
@@ -77,10 +75,10 @@ js : $(JS_EXECUTABLE)
 # NOTE: current version of emscripten would emit an exception if we
 # use -O1 or -O2 here
 $(JS_EXECUTABLE) : $(MRUBY_LIB) $(OBJS)
-	$(CC) $(ALL_CFLAGS) $(MRUBY_LIB) $(OBJS) -o $@
+	$(LL) $(ALL_CFLAGS) $(MRUBY_LIB) $(OBJS) -o $@
 
 webpage : $(MRUBY_LIB) $(OBJS)
-	$(CC) $(ALL_CFLAGS) $(MRUBY_LIB) $(OBJS) -o $(WEBPAGE)
+	$(LL) $(ALL_CFLAGS) $(MRUBY_LIB) $(OBJS) -o $(WEBPAGE)
 
 # TODO: .d files handling
 $(BUILD_DIR)/%.o : $(SRC_DIR)/%.c
@@ -89,7 +87,7 @@ $(BUILD_DIR)/%.o : $(SRC_DIR)/%.c
 # shared library, we create a .so file instead of .a due to emscripten's
 # recommendations
 $(MRUBY_LIB) : $(MRUBY_OBJS) $(MRUBY_OBJY) $(MRBLIB_OBJ)
-	$(CC) -shared -o $@ $(MRUBY_OBJS) $(MRUBY_OBJY) $(MRBLIB_OBJ)
+	$(AR) -shared -o $@ $(MRUBY_OBJS) $(MRUBY_OBJY) $(MRBLIB_OBJ)
 
 # objects compiled from source
 # TODO: include dependencies for .d files
