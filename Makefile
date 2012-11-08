@@ -113,7 +113,7 @@ $(MRBLIBC) :
 
 # apply patches to mruby
 applypatch :
-ifeq ($(PATCHES), "")
+ifneq ($(PATCHES),)
 	@(cd $(MRUBY_PATH) && git reset --hard && git apply $(PATCH_DIR)/*.patch && make clean)
 else
 	@echo "No patches needed to apply!"
