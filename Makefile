@@ -37,6 +37,7 @@ SRC_DIR := ./src
 BUILD_DIR := ./build
 
 PATCH_DIR := $(CURDIR)/patches
+PATCHES := $(wildcard $(PATCH_DIR)/*.patch)
 
 OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(wildcard $(SRC_DIR)/*.c))
 
@@ -112,7 +113,11 @@ $(MRBLIBC) :
 
 # apply patches to mruby
 applypatch :
+ifeq ($(PATCHES), "")
 	@(cd $(MRUBY_PATH) && git reset --hard && git apply $(PATCH_DIR)/*.patch && make clean)
+else
+	@echo "No patches needed to apply!"
+endif
 
 # clean up
 .PHONY : clean
