@@ -124,3 +124,4 @@ endif
 clean :
 	rm -f $(MRUBY_OBJS) $(MRUBY_OBJY) $(MRBLIB_OBJ) $(MRUBY_LIB)
 	rm -rf $(JS_EXECUTABLE) $(WEBPAGE) $(OBJS)
+	cd $(MRUBY_PATH); make clean
