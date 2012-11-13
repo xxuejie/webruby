@@ -5,9 +5,9 @@
 
 # compiler, linker, archiver path
 export EMSCRIPTEN_PATH = ./modules/emscripten
-export CC = $(EMSCRIPTEN_PATH)/em++
-export LL = $(EMSCRIPTEN_PATH)/em++
-export AR = $(EMSCRIPTEN_PATH)/em++
+export CC = $(EMSCRIPTEN_PATH)/emcc
+export LL = $(EMSCRIPTEN_PATH)/emcc
+export AR = $(EMSCRIPTEN_PATH)/emcc
 
 # TODO: Due to the different compiler/linker/archiver options,
 # now we leave to mruby itself to generate src/y.tab.c and
@@ -61,7 +61,7 @@ else ifeq ($(COMPILE_MODE),small)
   JSFLAGS = -Os
 endif
 
-ALL_CFLAGS = -x c++ \
+ALL_CFLAGS = \
 	-Wno-write-strings \
 	-Werror-implicit-function-declaration
 
