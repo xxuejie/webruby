@@ -61,9 +61,7 @@ else ifeq ($(COMPILE_MODE),small)
   JSFLAGS = -Os
 endif
 
-ALL_CFLAGS = \
-	-Wno-write-strings \
-	-Werror-implicit-function-declaration
+ALL_CFLAGS = -Wall -Werror-implicit-function-declaration
 
 ##############################
 # generic build targets, rules
