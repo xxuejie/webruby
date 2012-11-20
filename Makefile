@@ -16,12 +16,14 @@ export AR = $(EMSCRIPTEN_PATH)/emcc
 # temporary files and may be removed when build is finished in later
 # versions of mruby. We will come back to this later.
 
+BUILD_DIR := ./build
+
 # mruby settings
 MRUBY_PATH := ./modules/mruby
 MRBLIB_PATH := $(MRUBY_PATH)/mrblib
 
 MRUBY_SRC_DIR := $(MRUBY_PATH)/src
-MRUBY_BUILD_DIR := ./build/mruby
+MRUBY_BUILD_DIR := $(BUILD_DIR)/mruby/src
 
 MRUBY_LIB := $(MRUBY_BUILD_DIR)/libruby.so
 
@@ -32,9 +34,19 @@ MRUBY_OBJY := $(patsubst $(MRUBY_SRC_DIR)/%.c,$(MRUBY_BUILD_DIR)/%.o,$(YC))
 MRBLIB_OBJ := $(patsubst $(MRBLIB_PATH)/%.c,$(MRUBY_BUILD_DIR)/%.o,$(MRBLIBC))
 MRUBY_OBJS := $(patsubst $(MRUBY_SRC_DIR)/%.c,$(MRUBY_BUILD_DIR)/%.o,$(filter-out $(EXCEPT1),$(wildcard $(MRUBY_SRC_DIR)/*.c)))
 
+# mruby js tests
+MRUBY_TEST_SRC_DIR := $(MRUBY_PATH)/test
+MRUBY_TEST_BUILD_DIR := $(BUILD_DIR)/mruby/test
+
+MRUBY_CLIB_SRC := $(MRUBY_TEST_SRC_DIR)/mrbtest.c
+MRUBY_TEST_SRC := $(MRUBY_CLIB_SRC) $(MRUBY_TEST_SRC_DIR)/driver.c
+
+MRUBY_TEST_OBJS := $(patsubst $(MRUBY_TEST_SRC_DIR)/%.c,$(MRUBY_TEST_BUILD_DIR)/%.o,$(MRUBY_TEST_SRC))
+
+TEST_TARGET := $(BUILD_DIR)/mruby-test.js
+
 # sources
 SRC_DIR := ./src
-BUILD_DIR := ./build
 
 PATCH_DIR := $(CURDIR)/patches
 PATCHES := $(wildcard $(PATCH_DIR)/*.patch)
@@ -117,9 +129,25 @@ else
 	@echo "No patches needed to apply!"
 endif
 
+# tests
+.PHONY : test
+test: $(TEST_TARGET)
+	@echo "Running mruby test in Node.js!"
+	node $(TEST_TARGET)
+
+$(TEST_TARGET) : $(MRUBY_TEST_OBJS) $(MRUBY_LIB)
+	$(LL) $(ALL_CFLAGS) $(MRUBY_TEST_OBJS) $(MRUBY_LIB) -o $(TEST_TARGET)
+
+$(MRUBY_TEST_BUILD_DIR)/%.o : $(MRUBY_TEST_SRC_DIR)/%.c
+	$(CC) $(ALL_CFLAGS) -MMD $(INCLUDES) -c $< -o $@
+
+$(MRUBY_CLIB_SRC):
+	@(cd $(MRUBY_PATH); make test)
+
 # clean up
 .PHONY : clean
 clean :
 	rm -f $(MRUBY_OBJS) $(MRUBY_OBJY) $(MRBLIB_OBJ) $(MRUBY_LIB)
-	rm -rf $(JS_EXECUTABLE) $(WEBPAGE) $(OBJS)
+	rm -f $(JS_EXECUTABLE) $(WEBPAGE) $(OBJS)
+	rm -f $(TEST_TARGET) $(MRUBY_TEST_OBJS)
 	cd $(MRUBY_PATH); make clean
