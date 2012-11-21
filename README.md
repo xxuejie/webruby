@@ -30,10 +30,8 @@ If you make changes to the source code, you can simply use `make` to rebuild it.
 
 * exception.rb: Crashed when running 'Exception 14'
 * proc.rb: Crashed when running 'Proc.new', '15.2.17.3.1'
-
 * float.rb: ALL PASS(with Pull Request 564 of mruby)
 * string.rb: ALL PASS(when using MRB\_USE\_FLOAT when compiling)
-
 * argumenterror.rb: ALL PASS
 * array.rb: ALL PASS
 * basicobject.rb: ALL PASS
