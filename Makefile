@@ -90,6 +90,7 @@ ALL_CFLAGS = -Wall -Werror-implicit-function-declaration \
 .PHONY : all
 all : js
 
+.PHONY : js
 js : $(JS_EXECUTABLE)
 
 # NOTE: current version of emscripten would emit an exception if we
@@ -97,6 +98,7 @@ js : $(JS_EXECUTABLE)
 $(JS_EXECUTABLE) : $(MRUBY_LIB) $(OBJS)
 	$(LL) $(ALL_CFLAGS) $(MRUBY_LIB) $(OBJS) -o $@
 
+.PHONY : webpage
 webpage : $(MRUBY_LIB) $(OBJS)
 	$(LL) $(ALL_CFLAGS) $(MRUBY_LIB) $(OBJS) -o $(WEBPAGE)
 
@@ -123,11 +125,14 @@ $(MRBLIB_OBJ): $(MRBLIBC)
 	$(CC) $(ALL_CFLAGS) -MMD $(INCLUDES) -c $(MRBLIBC) -o $(MRBLIB_OBJ)
 
 # yacc compile
-$(YC) :
-	@(cd $(MRUBY_PATH); make)
+$(YC) : mruby
 
 # mrblib.c compile
-$(MRBLIBC) :
+$(MRBLIBC) : mruby
+
+# mruby build
+.PHONY : mruby
+mruby :
 	@(cd $(MRUBY_PATH); make)
 
 # apply patches to mruby
