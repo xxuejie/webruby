@@ -73,7 +73,16 @@ else ifeq ($(COMPILE_MODE),small)
   JSFLAGS = -Os
 endif
 
-ALL_CFLAGS = -Wall -Werror-implicit-function-declaration
+# Note: we found that when compiling mruby using double,
+# the unit test String#to_f [15.2.10.5.39] would fail, since
+# according to v8, the difference between 123456789 and
+# 123456789.0 is 1.4901161193848e-08, which is larger than
+# 1E-12. So until we found a way to work around this(this may
+# due to the generated js code or the problem with v8, we
+# just cannot tell which is the reason for now), we have
+# to compile mruby in float mode here.
+ALL_CFLAGS = -Wall -Werror-implicit-function-declaration \
+	-DMRB_USE_FLOAT
 
 ##############################
 # generic build targets, rules
@@ -122,6 +131,7 @@ $(MRBLIBC) :
 	@(cd $(MRUBY_PATH); make)
 
 # apply patches to mruby
+.PHONY : applypatch
 applypatch :
 ifneq ($(PATCHES),)
 	@(cd $(MRUBY_PATH) && git reset --hard && git apply $(PATCH_DIR)/*.patch && make clean)
