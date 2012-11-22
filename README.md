@@ -28,10 +28,7 @@ If you make changes to the source code, you can simply use `make` to rebuild it.
 
 # Unit test status
 
-* exception.rb: Crashed when running 'Exception 14'
-* proc.rb: Crashed when running 'Proc.new', '15.2.17.3.1'
-* float.rb: ALL PASS(with Pull Request 564 of mruby)
-* string.rb: ALL PASS(when using MRB\_USE\_FLOAT when compiling)
+* string.rb: ALL PASS(uses MRB\_USE\_FLOAT flag and Pull Request 726 of emscripten)
 * argumenterror.rb: ALL PASS
 * array.rb: ALL PASS
 * basicobject.rb: ALL PASS
@@ -40,7 +37,9 @@ If you make changes to the source code, you can simply use `make` to rebuild it.
 * class.rb: ALL PASS
 * comparable.rb: ALL PASS
 * enumerable.rb: ALL PASS
+* exception.rb: ALL PASS
 * false.rb: ALL PASS
+* float.rb: ALL PASS
 * hash.rb: ALL PASS
 * indexerror.rb: ALL PASS
 * integer.rb: ALL PASS
@@ -54,6 +53,7 @@ If you make changes to the source code, you can simply use `make` to rebuild it.
 * nomethoderror.rb ALL PASS
 * numeric.rb ALL PASS
 * object.rb: ALL PASS
+* proc.rb: ALL PASS
 * range.rb: ALL PASS
 * rangeerror.rb: ALL PASS
 * regexperror.rb: ALL PASS
