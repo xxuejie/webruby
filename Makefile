@@ -5,9 +5,9 @@
 
 # compiler, linker, archiver path
 export EMSCRIPTEN_PATH = ./modules/emscripten
-export CC = $(EMSCRIPTEN_PATH)/emcc
-export LL = $(EMSCRIPTEN_PATH)/emcc
-export AR = $(EMSCRIPTEN_PATH)/emcc
+export CC = $(EMSCRIPTEN_PATH)/em++
+export LL = $(EMSCRIPTEN_PATH)/em++
+export AR = $(EMSCRIPTEN_PATH)/em++
 
 # TODO: Due to the different compiler/linker/archiver options,
 # now we leave to mruby itself to generate src/y.tab.c and
@@ -81,8 +81,9 @@ endif
 # due to the generated js code or the problem with v8, we
 # just cannot tell which is the reason for now), we have
 # to compile mruby in float mode here.
-ALL_CFLAGS = -Wall -Werror-implicit-function-declaration \
-	-DMRB_USE_FLOAT
+ALL_CFLAGS = -Werror-implicit-function-declaration \
+	-DMRB_USE_FLOAT \
+	-DMRB_USE_EXCEPTION -Wno-write-strings -s EXCEPTION_DEBUG=0
 
 ##############################
 # generic build targets, rules
