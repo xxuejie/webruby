@@ -28,7 +28,7 @@ If you make changes to the source code, you can simply use `make` to rebuild it.
 
 # Unit test status
 
-* string.rb: ALL PASS(uses MRB\_USE\_FLOAT flag and Pull Request 726 of emscripten)
+* string.rb: ALL PASS(uses MRB\_USE\_FLOAT flag)
 * argumenterror.rb: ALL PASS
 * array.rb: ALL PASS
 * basicobject.rb: ALL PASS
