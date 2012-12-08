@@ -5,9 +5,9 @@
 
 # compiler, linker, archiver path
 export EMSCRIPTEN_PATH = ./modules/emscripten
-export CC = $(EMSCRIPTEN_PATH)/em++
-export LL = $(EMSCRIPTEN_PATH)/em++
-export AR = $(EMSCRIPTEN_PATH)/em++
+export CC = $(EMSCRIPTEN_PATH)/emcc
+export LL = $(EMSCRIPTEN_PATH)/emcc
+export AR = $(EMSCRIPTEN_PATH)/emcc
 
 # TODO: Due to the different compiler/linker/archiver options,
 # now we leave to mruby itself to generate src/y.tab.c and
@@ -83,7 +83,10 @@ endif
 # to compile mruby in float mode here.
 ALL_CFLAGS = -Werror-implicit-function-declaration \
 	-DMRB_USE_FLOAT \
-	-DMRB_USE_EXCEPTION -Wno-write-strings -s EXCEPTION_DEBUG=0
+	-DMRB_USE_EXCEPTION -Wno-write-strings \
+	-s EXCEPTION_DEBUG=0 \
+	-s ALLOW_MEMORY_GROWTH=1
+# TODO: test why we need to allow memory growth
 
 ##############################
 # generic build targets, rules
