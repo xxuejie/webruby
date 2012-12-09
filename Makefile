@@ -82,11 +82,11 @@ endif
 # just cannot tell which is the reason for now), we have
 # to compile mruby in float mode here.
 ALL_CFLAGS = -Werror-implicit-function-declaration \
-	-DMRB_USE_FLOAT \
-	-DMRB_USE_EXCEPTION -Wno-write-strings \
-	-s EXCEPTION_DEBUG=0 \
-	-s ALLOW_MEMORY_GROWTH=1
-# TODO: test why we need to allow memory growth
+	-DMRB_USE_FLOAT
+
+# one test case in exception.rb tests the case of a very
+# deeply recursive function, which needs a lot of memory
+TEST_FLAGS = -s ALLOW_MEMORY_GROWTH=1
 
 ##############################
 # generic build targets, rules
@@ -155,7 +155,7 @@ test: $(TEST_TARGET)
 	node $(TEST_TARGET)
 
 $(TEST_TARGET) : $(MRUBY_TEST_OBJS) $(MRUBY_LIB)
-	$(LL) $(ALL_CFLAGS) $(MRUBY_TEST_OBJS) $(MRUBY_LIB) -o $(TEST_TARGET)
+	$(LL) $(ALL_CFLAGS) $(TEST_FLAGS) $(MRUBY_TEST_OBJS) $(MRUBY_LIB) -o $(TEST_TARGET)
 
 $(MRUBY_TEST_BUILD_DIR)/%.o : $(MRUBY_TEST_SRC_DIR)/%.c
 	$(CC) $(ALL_CFLAGS) -MMD $(INCLUDES) -c $< -o $@
