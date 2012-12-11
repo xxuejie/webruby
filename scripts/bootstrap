@@ -17,11 +17,6 @@ if [ $? -ne 0 ]; then
     on_error;
 fi
 
-make applypatch
-if [ $? -ne 0 ]; then
-    on_error;
-fi
-
 make
 if [ $? -ne 0 ]; then
     on_error;

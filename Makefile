@@ -47,10 +47,6 @@ TEST_TARGET := $(BUILD_DIR)/mruby-test.js
 
 # sources
 SRC_DIR := ./src
-
-PATCH_DIR := $(CURDIR)/patches
-PATCHES := $(wildcard $(PATCH_DIR)/*.patch)
-
 OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(wildcard $(SRC_DIR)/*.c))
 
 # final js executable(or html page)
@@ -138,15 +134,6 @@ $(MRBLIBC) : mruby
 .PHONY : mruby
 mruby :
 	@(cd $(MRUBY_PATH); make)
-
-# apply patches to mruby
-.PHONY : applypatch
-applypatch :
-ifneq ($(PATCHES),)
-	@(cd $(MRUBY_PATH) && git reset --hard && git apply $(PATCH_DIR)/*.patch && make clean)
-else
-	@echo "No patches needed to apply!"
-endif
 
 # tests
 .PHONY : test
