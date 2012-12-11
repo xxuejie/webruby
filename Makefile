@@ -3,11 +3,25 @@
 # it against our provided source code including the main function
 # This Makefile is inspired from the mruby Makefile
 
+# TODO: This makefile has gone too big, it contains several
+# different parts:
+# 1. normal mruby compiling for generated c files
+# 2. emscripten mruby compiling
+# 3. emscripten mruby tests
+# 4. source code compiling and final linking
+# mruby and emscripten reside in separate modules, so if we
+# split mruby compiling part, we may result in a folder with
+# only a Makefile(is this a good practice?). We may want to
+# come back to this later for a better directory structure.
+
 # compiler, linker, archiver path
 export EMSCRIPTEN_PATH = ./modules/emscripten
 export CC = $(EMSCRIPTEN_PATH)/emcc
 export LL = $(EMSCRIPTEN_PATH)/emcc
 export AR = $(EMSCRIPTEN_PATH)/emcc
+
+export RM_F := rm -f
+export CAT := cat
 
 # TODO: Due to the different compiler/linker/archiver options,
 # now we leave to mruby itself to generate src/y.tab.c and
@@ -34,6 +48,8 @@ MRUBY_OBJY := $(patsubst $(MRUBY_SRC_DIR)/%.c,$(MRUBY_BUILD_DIR)/%.o,$(YC))
 MRBLIB_OBJ := $(patsubst $(MRBLIB_PATH)/%.c,$(MRUBY_BUILD_DIR)/%.o,$(MRBLIBC))
 MRUBY_OBJS := $(patsubst $(MRUBY_SRC_DIR)/%.c,$(MRUBY_BUILD_DIR)/%.o,$(filter-out $(EXCEPT1),$(wildcard $(MRUBY_SRC_DIR)/*.c)))
 
+MRBC := $(MRUBY_PATH)/bin/mrbc
+
 # mruby js tests
 MRUBY_TEST_SRC_DIR := $(MRUBY_PATH)/test
 MRUBY_TEST_BUILD_DIR := $(BUILD_DIR)/mruby/test
@@ -47,7 +63,14 @@ TEST_TARGET := $(BUILD_DIR)/mruby-test.js
 
 # sources
 SRC_DIR := ./src
-OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(wildcard $(SRC_DIR)/*.c))
+SRC_ENTRYPOINT := $(SRC_DIR)/app.rb
+SRC_REST := $(filter-out $(SRC_ENTRYPOINT),$(wildcard $(SRC_DIR)/*.rb))
+SRC_DRIVER := $(SRC_DIR)/driver.c
+
+SRC_RBTMP := $(BUILD_DIR)/rbcode.rb
+SRC_CTMP := $(BUILD_DIR)/rbcode.c
+SRC_MAIN := $(BUILD_DIR)/main.c
+OBJ_MAIN := $(BUILD_DIR)/main.o
 
 # final js executable(or html page)
 JS_EXECUTABLE := $(BUILD_DIR)/mruby.js
@@ -95,16 +118,28 @@ js : $(JS_EXECUTABLE)
 
 # NOTE: current version of emscripten would emit an exception if we
 # use -O1 or -O2 here
-$(JS_EXECUTABLE) : $(MRUBY_LIB) $(OBJS)
-	$(LL) $(ALL_CFLAGS) $(MRUBY_LIB) $(OBJS) -o $@
+$(JS_EXECUTABLE) : $(MRUBY_LIB) $(OBJ_MAIN)
+	$(LL) $(ALL_CFLAGS) $(MRUBY_LIB) $(OBJ_MAIN) -o $@
 
 .PHONY : webpage
-webpage : $(MRUBY_LIB) $(OBJS)
-	$(LL) $(ALL_CFLAGS) $(MRUBY_LIB) $(OBJS) -o $(WEBPAGE)
+webpage : $(MRUBY_LIB) $(OBJ_MAIN)
+	$(LL) $(ALL_CFLAGS) $(MRUBY_LIB) $(OBJ_MAIN) -o $(WEBPAGE)
 
-# TODO: .d files handling
-$(BUILD_DIR)/%.o : $(SRC_DIR)/%.c
+$(OBJ_MAIN) : $(SRC_MAIN)
 	$(CC) $(ALL_CFLAGS) -MMD $(INCLUDES) -c $< -o $@
+
+$(SRC_MAIN) : $(SRC_CTMP) $(SRC_DRIVER)
+	$(CAT) $(SRC_DRIVER) $(SRC_CTMP) > $(SRC_MAIN)
+
+$(SRC_CTMP) : $(SRC_RBTMP) $(MRBC)
+	$(MRBC) -Bapp_irep -o$@ $(SRC_RBTMP)
+
+# entrypoint file comes last
+$(SRC_RBTMP) : $(SRC_ENTRYPOINT) $(SRC_REST)
+	$(CAT) $(SRC_REST) $(SRC_ENTRYPOINT) > $(SRC_RBTMP)
+
+############################
+# mruby build targets, rules
 
 # shared library, we create a .so file instead of .a due to emscripten's
 # recommendations
@@ -130,12 +165,15 @@ $(YC) : mruby
 # mrblib.c compile
 $(MRBLIBC) : mruby
 
+# mrbc binary(used for compiling mruby source code into bytecode)
+$(MRBC) : mruby
+
 # mruby build
 .PHONY : mruby
 mruby :
 	@(cd $(MRUBY_PATH); make)
 
-# tests
+# mruby tests
 .PHONY : test
 test: $(TEST_TARGET)
 	@echo "Running mruby test in Node.js!"
@@ -153,7 +191,8 @@ $(MRUBY_CLIB_SRC):
 # clean up
 .PHONY : clean
 clean :
-	rm -f $(MRUBY_OBJS) $(MRUBY_OBJY) $(MRBLIB_OBJ) $(MRUBY_LIB)
-	rm -f $(JS_EXECUTABLE) $(WEBPAGE) $(OBJS)
-	rm -f $(TEST_TARGET) $(MRUBY_TEST_OBJS)
+	$(RM_F) $(MRUBY_OBJS) $(MRUBY_OBJY) $(MRBLIB_OBJ) $(MRUBY_LIB)
+	$(RM_F) $(JS_EXECUTABLE) $(WEBPAGE)
+	$(RM_F) $(OBJ_MAIN) $(SRC_MAIN) $(SRC_CTMP) $(SRC_RBTMP)
+	$(RM_F) $(TEST_TARGET) $(MRUBY_TEST_OBJS)
 	cd $(MRUBY_PATH); make clean
