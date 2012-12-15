@@ -6,7 +6,8 @@ JavaScript and runs in the browser.
 
 # How to use this
 
-    $ git clone git://github.com/xxuejie/mruby-browser.git
+    $ git clone git://github.com/xxuejie/webruby.git
+    $ cd webruby
     $ git submodule init
     $ git submodule update
     $ make
