@@ -1,0 +1,97 @@
+#!/bin/bash
+
+# script for rebuilding mruby module
+
+# Usage:
+
+# ./rebuild_mruby_module: generate mrbc and libmruby.so file for
+# parsing mruby file and linking into final js file respectively,
+# if we already generate the latest version of these two files(judging
+# by the last commit in git repository), we do not rebuild the files
+
+# ./rebuild_mruby_module test: generate mrbc binary, libmruby.so
+# library and mruby-test.js file for mruby unit test. Notice in this
+# case, we would always rebuilding the mruby project regardless of
+# last commits. This is for development purpose.
+
+
+# First, navigates to mruby directory
+cd `dirname ${BASH_SOURCE[0]}`/../modules/mruby
+
+# Uses absolute paths here
+MRUBY_DIR=`pwd`
+BUILD_PATH=${MRUBY_DIR}/../../build
+LAST_COMMIT_FILE=${BUILD_PATH}/last-commit.txt
+MRBC_FILE=${BUILD_PATH}/mrbc
+LIB_FILE=${BUILD_PATH}/libmruby.so
+MRUBY_JS_TEST_FILE=${BUILD_PATH}/mruby-test.js
+
+# Gets current commit revision
+CURRENT_COMMIT=`git rev-list --max-count=1 HEAD`
+
+# Gets the commit revision of last mruby build
+LAST_BUILD_COMMIT=""
+if [ -f $LAST_COMMIT_FILE ]; then
+    LAST_BUILD_COMMIT=`cat ${LAST_COMMIT_FILE}`
+fi
+
+# If mruby has no changes, we do not need to build it again
+# Note that if we set the flag to build tests, mruby is always
+# recompiled regardless of the commit revision.
+if [[ ${CURRENT_COMMIT} == ${LAST_BUILD_COMMIT} ]] && [[ $1 != "test" ]]; then
+    echo "mruby has no updates since last built, exit."
+    exit 0
+fi
+
+# Now starts building mruby, first build the native version for mrbc
+make clean && make
+if [ $? -ne 0 ]; then
+    echo "Error occurs when building native mruby!"
+    exit 1
+fi
+
+cp bin/mrbc ${MRBC_FILE}
+
+# Now build mruby again using emscripten
+EMSCRIPTEN_DIR=${MRUBY_DIR}/../emscripten
+EMCC=${EMSCRIPTEN_DIR}/emcc
+EMAR=${EMSCRIPTEN_DIR}/emar
+
+# Refer to Makefile for the reason of adding -DMRB_USE_FLOAT flag
+CUSTOM_MAKE_FLAGS="CC=${EMCC} LL=${EMCC} AR=${EMAR} MRBC=${MRBC_FILE} CP=cp CAT=cat CFLAGS=-DMRB_USE_FLOAT"
+
+make clean && make -C src ${CUSTOM_MAKE_FLAGS} && touch ${MRBC_FILE} && make -C mrblib ${CUSTOM_MAKE_FLAGS}
+if [ $? -ne 0 ]; then
+    echo "Error occurs when building mruby using emscripten!"
+    exit 1
+fi
+
+# We found some odd behaviours just as documented at here:
+# https://github.com/kripken/emscripten/wiki/Building-Projects
+# If we use emar, the linker would eliminate all mruby functions, which
+# is definitely not what we want, so here we generate a new .so file instead
+# of using the old .a file. This is only a temporary fix, we may come back
+# to this later.
+$EMCC -shared -o ${LIB_FILE} ${MRUBY_DIR}/src/*.o ${MRUBY_DIR}/mrblib/*.o
+if [ $? -ne 0 ]; then
+    echo "Error occurs when generating libmruby.so!"
+    exit 1
+fi
+
+if [[ $1 == "test" ]]; then
+    make -C test mrbtest ${CUSTOM_MAKE_FLAGS}
+    if [ $? -ne 0 ]; then
+        echo "Error occurs when building mruby tests using emscripten!"
+        exit 1
+    fi
+
+    $EMCC -o ${MRUBY_JS_TEST_FILE} -s ALLOW_MEMORY_GROWTH=1 -lm ${MRUBY_DIR}/src/*.o ${MRUBY_DIR}/mrblib/*.o ${MRUBY_DIR}/test/*.o
+    if [ $? -ne 0 ]; then
+        echo "Error occurs when generating mruby test js file!"
+        exit 1
+    fi
+fi
+
+echo ${CURRENT_COMMIT} > ${LAST_COMMIT_FILE}
+
+echo "Finish building mruby!"
