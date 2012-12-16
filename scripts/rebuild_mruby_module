@@ -23,7 +23,7 @@ MRUBY_DIR=`pwd`
 BUILD_PATH=${MRUBY_DIR}/../../build
 LAST_COMMIT_FILE=${BUILD_PATH}/last-commit.txt
 MRBC_FILE=${BUILD_PATH}/mrbc
-LIB_FILE=${BUILD_PATH}/libmruby.so
+LIB_FILE=${BUILD_PATH}/libmruby.a
 MRUBY_JS_TEST_FILE=${BUILD_PATH}/mruby-test.js
 
 # Gets current commit revision
@@ -66,13 +66,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# We found some odd behaviours just as documented at here:
-# https://github.com/kripken/emscripten/wiki/Building-Projects
-# If we use emar, the linker would eliminate all mruby functions, which
-# is definitely not what we want, so here we generate a new .so file instead
-# of using the old .a file. This is only a temporary fix, we may come back
-# to this later.
-$EMCC -shared -o ${LIB_FILE} ${MRUBY_DIR}/src/*.o ${MRUBY_DIR}/mrblib/*.o
+cp lib/libmruby.a ${LIB_FILE}
 if [ $? -ne 0 ]; then
     echo "Error occurs when generating libmruby.so!"
     exit 1
@@ -85,7 +79,7 @@ if [[ $1 == "test" ]]; then
         exit 1
     fi
 
-    $EMCC -o ${MRUBY_JS_TEST_FILE} -s ALLOW_MEMORY_GROWTH=1 -lm ${MRUBY_DIR}/src/*.o ${MRUBY_DIR}/mrblib/*.o ${MRUBY_DIR}/test/*.o
+    $EMCC -o ${MRUBY_JS_TEST_FILE} -s ALLOW_MEMORY_GROWTH=1 ${MRUBY_DIR}/test/*.o ${LIB_FILE} -lm
     if [ $? -ne 0 ]; then
         echo "Error occurs when generating mruby test js file!"
         exit 1

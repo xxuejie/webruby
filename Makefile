@@ -12,7 +12,7 @@ MRUBY_PATH := ./modules/mruby
 MRUBY_SRC_DIR := $(MRUBY_PATH)/src
 
 MRUBY_TEST_TARGET := $(BUILD_DIR)/mruby-test.js
-MRUBY_LIB := $(BUILD_DIR)/libmruby.so
+MRUBY_LIB := $(BUILD_DIR)/libmruby.a
 MRBC := $(BUILD_DIR)/mrbc
 MRUBY_FILES := $(MRUBY_LIB) $(MRBC) $(BUILD_DIR)/last-commit.txt
 
@@ -57,11 +57,11 @@ js : $(JS_EXECUTABLE)
 # NOTE: current version of emscripten would emit an exception if we
 # use -O1 or -O2 here
 $(JS_EXECUTABLE) : $(MRUBY_LIB) $(OBJ_MAIN)
-	$(LL) $(ALL_CFLAGS) $(MRUBY_LIB) $(OBJ_MAIN) -o $@
+	$(LL) $(ALL_CFLAGS) $(OBJ_MAIN) $(MRUBY_LIB) -o $@
 
 .PHONY : webpage
 webpage : $(MRUBY_LIB) $(OBJ_MAIN)
-	$(LL) $(ALL_CFLAGS) $(MRUBY_LIB) $(OBJ_MAIN) -o $(WEBPAGE)
+	$(LL) $(ALL_CFLAGS) $(OBJ_MAIN) $(MRUBY_LIB) -o $(WEBPAGE)
 
 $(OBJ_MAIN) : $(SRC_MAIN)
 	$(CC) $(ALL_CFLAGS) -MMD $(INCLUDES) -c $< -o $@
