@@ -7,11 +7,10 @@ export CC = $(EMSCRIPTEN_PATH)/emcc
 export LL = $(EMSCRIPTEN_PATH)/emcc
 
 BUILD_DIR := ./build
-
 MRUBY_PATH := ./modules/mruby
-MRUBY_SRC_DIR := $(MRUBY_PATH)/src
 
-MRUBY_TEST_TARGET := $(BUILD_DIR)/mruby-test.js
+# mruby files
+MRUBY_TEST_TARGET := $(BUILD_DIR)/mrbtest.js
 MRUBY_LIB := $(BUILD_DIR)/libmruby.a
 MRBC := $(BUILD_DIR)/mrbc
 MRUBY_FILES := $(MRUBY_LIB) $(MRBC) $(BUILD_DIR)/last-commit.txt
@@ -32,6 +31,7 @@ JS_EXECUTABLE := $(BUILD_DIR)/mruby.js
 WEBPAGE := $(BUILD_DIR)/mruby.html
 
 # libraries, includes
+MRUBY_SRC_DIR := $(MRUBY_PATH)/src
 INCLUDES = -I$(MRUBY_SRC_DIR) -I$(MRUBY_SRC_DIR)/../include
 
 # Note: we found that when compiling mruby using double,
@@ -101,6 +101,5 @@ mruby-test :
 clean :
 	rm -f $(JS_EXECUTABLE) $(WEBPAGE)
 	rm -f $(OBJ_MAIN) $(SRC_MAIN) $(SRC_CTMP) $(SRC_RBTMP)
-	rm -f $(MRUBY_TEST_TARGET)
-	rm -f $(MRUBY_FILES)
+	rm -f $(MRUBY_TEST_TARGET) $(MRUBY_FILES)
 	make -C $(MRUBY_PATH) clean

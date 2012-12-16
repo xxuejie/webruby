@@ -56,13 +56,31 @@ cp bin/mrbc ${MRBC_FILE}
 EMSCRIPTEN_DIR=${MRUBY_DIR}/../emscripten
 EMCC=${EMSCRIPTEN_DIR}/emcc
 EMAR=${EMSCRIPTEN_DIR}/emar
-
 # Refer to Makefile for the reason of adding -DMRB_USE_FLOAT flag
-CUSTOM_MAKE_FLAGS="CC=${EMCC} LL=${EMCC} AR=${EMAR} MRBC=${MRBC_FILE} CP=cp CAT=cat CFLAGS=-DMRB_USE_FLOAT"
+EMCC_CFLAGS="-DMRB_USE_FLOAT"
 
-make clean && make -C src ${CUSTOM_MAKE_FLAGS} && touch ${MRBC_FILE} && make -C mrblib ${CUSTOM_MAKE_FLAGS}
+# Executes make command with emcc as compiler
+#
+# Arguments:
+#  - MAKE_LOC => Location for running make
+#  - MAKE_TARGET => Make target, can be empty for default target
+#  - CUSTOM_MAKE_FLAGS => Additional make flags needed
+#
+# Notes:
+#  Due to the wired behaviour of bash escaping, we use "bash -c" mode here.
+function emcc_make() {
+    bash -c "make -C ${MAKE_LOC} CC=${EMCC} LL=${EMCC} AR=${EMAR} CP=cp CAT=cat CFLAGS=\"${EMCC_CFLAGS}\" ${CUSTOM_MAKE_FLAGS} ${MAKE_TARGET}"
+}
+
+# Here make target is "all"(default)
+unset MAKE_TARGET
+CUSTOM_MAKE_FLAGS="MRBC=${MRBC_FILE}"
+
+# We run a touch on MRBC_FILE to use the generated binary from previous native
+# build instead of building a new one using emcc here(which will not work).
+make clean && MAKE_LOC=src; emcc_make && touch ${MRBC_FILE} && MAKE_LOC=mrblib; emcc_make
 if [ $? -ne 0 ]; then
-    echo "Error occurs when building mruby using emscripten!"
+    echo "Error occurs when building mrblib using emscripten!"
     exit 1
 fi
 
@@ -73,13 +91,17 @@ if [ $? -ne 0 ]; then
 fi
 
 if [[ $1 == "test" ]]; then
-    make -C test mrbtest ${CUSTOM_MAKE_FLAGS}
+    MAKE_TARGET=mrbtest.js
+    CUSTOM_MAKE_FLAGS="LDFLAGS=\"-s ALLOW_MEMORY_GROWTH=1\" EXE=${MAKE_TARGET} MRBC=${MRBC_FILE}"
+
+    touch ${MRBC_FILE}; MAKE_LOC=test; emcc_make
     if [ $? -ne 0 ]; then
         echo "Error occurs when building mruby tests using emscripten!"
         exit 1
     fi
 
-    $EMCC -o ${MRUBY_JS_TEST_FILE} -s ALLOW_MEMORY_GROWTH=1 ${MRUBY_DIR}/test/*.o ${LIB_FILE} -lm
+    # mrbtest.js does not belong to mruby, so we would move it instead of copying it.
+    mv ${MRUBY_DIR}/test/${MAKE_TARGET} ${BUILD_PATH}
     if [ $? -ne 0 ]; then
         echo "Error occurs when generating mruby test js file!"
         exit 1
