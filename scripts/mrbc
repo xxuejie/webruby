@@ -1,0 +1,90 @@
+#!/usr/bin/env node
+// -*- JavaScript -*-
+
+// This is a wrapper over mrbc.js, it reads the content of source code, calls
+// emscripten-generated mrbc.js file to parse it, and finally writes the result
+// back to the output file.
+// This file serves as a workaround for the problem that mrbc.js cannot read from
+// or write to local files.
+
+(function () {
+  'use strict';
+
+  var file_args = [], option_args = [], i, arg,
+    in_data = [], out_data = [], out_file_name,
+    fs = require('fs'), StringDecoder = require('string_decoder').StringDecoder;
+
+  function runWithData(data) {
+    var mrbc, ret, out_string, decoder;
+
+    global.Module = {
+      stdin: function () { return data.shift() || null; },
+      stdout: function (x) { out_data.push(x); },
+      noInitialRun: true
+    };
+
+    option_args.push("-");
+
+    mrbc = require("./mrbc.js");
+    ret = global.Module.run(option_args);
+
+    if (ret === 0) {
+      decoder = new StringDecoder('utf8');
+      out_string = decoder.write(new Buffer(out_data));
+
+      if ((typeof out_file_name === 'string') && (out_file_name.length > 0)) {
+        // file
+        fs.writeFile(out_file_name, out_string, function (err) {
+          if (err) {
+            console.log("Error writing file: " + out_file_name);
+            console.log(err);
+            process.exit(1);
+          } else {
+            process.exit(ret);
+          }
+        });
+      } else {
+        // stdout
+        console.log("Output data is: " + out_string);
+      }
+    } else {
+      console.log("Error occurs when running mrbc!");
+      process.exit(ret);
+    }
+  }
+
+  function onDataReceived(file_data) {
+    if (file_data) {
+      in_data.push.apply(in_data, file_data);
+    }
+
+    if (file_args.length === 0) {
+      runWithData(in_data);
+    } else {
+      var file_name = file_args.shift();
+      fs.readFile(file_name, function (err, data) {
+        if (err) {
+          console.log("Error reading file: " + file_name);
+          console.log(err);
+          process.exit(1);
+        }
+        onDataReceived(data);
+      });
+    }
+  }
+
+  for (i = 2; i < process.argv.length; i = i + 1) {
+    arg = process.argv[i];
+    if (arg[0] === '-') {
+      if ((arg.length >= 2) && (arg[1] === 'o')) {
+        out_file_name = arg.substring(2);
+      } else {
+        option_args.push(arg);
+      }
+    } else {
+      file_args.push(arg);
+    }
+  }
+
+  onDataReceived();
+}());

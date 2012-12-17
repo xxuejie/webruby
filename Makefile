@@ -2,18 +2,28 @@
 # Build JavaScript module from mruby source code and link
 # it against our provided source code including the main function
 
-export EMSCRIPTEN_PATH = ./modules/emscripten
-export CC = $(EMSCRIPTEN_PATH)/emcc
-export LL = $(EMSCRIPTEN_PATH)/emcc
+BASE_DIR := $(realpath .)
+
+export EMSCRIPTEN_DIR = $(BASE_DIR)/modules/emscripten
+export CC = $(EMSCRIPTEN_DIR)/emcc
+export LL = $(EMSCRIPTEN_DIR)/emcc
+export AR = $(EMSCRIPTEN_DIR)/emar
 
 BUILD_DIR := ./build
-MRUBY_PATH := ./modules/mruby
+
+MRB_DIR := ./modules/mruby
+MRB_SRC_DIR := $(MRB_DIR)/src
+MRB_MRBC_DIR := $(MRB_DIR)/tools/mrbc
+MRB_LIB_DIR := $(MRB_DIR)/mrblib
+MRB_TEST_DIR := $(MRB_DIR)/test
 
 # mruby files
-MRUBY_TEST_TARGET := $(BUILD_DIR)/mrbtest.js
-MRUBY_LIB := $(BUILD_DIR)/libmruby.a
-MRBC := $(BUILD_DIR)/mrbc
-MRUBY_FILES := $(MRUBY_LIB) $(MRBC) $(BUILD_DIR)/last-commit.txt
+MRB_TEST_TARGET := $(BASE_DIR)/$(BUILD_DIR)/mrbtest.js
+
+MRB_CORE_LIB := $(MRB_DIR)/lib/libmruby_core.a
+MRB_LIB := $(MRB_DIR)/lib/libmruby.a
+MRB_MRBC := $(MRB_DIR)/bin/mrbc
+MRB_MRBC_JS := $(MRB_DIR)/bin/mrbc.js
 
 # sources
 SRC_DIR := ./src
@@ -30,9 +40,18 @@ OBJ_MAIN := $(BUILD_DIR)/main.o
 JS_EXECUTABLE := $(BUILD_DIR)/mruby.js
 WEBPAGE := $(BUILD_DIR)/mruby.html
 
+ifeq ($(strip $(ENABLE_GEMS)),)
+  # by default GEMs are deactivated
+  ENABLE_GEMS = false
+endif
+
+ifeq ($(strip $(ACTIVE_GEMS)),)
+  # the default file which contains the active GEMs
+  ACTIVE_GEMS = GEMS.active
+endif
+
 # libraries, includes
-MRUBY_SRC_DIR := $(MRUBY_PATH)/src
-INCLUDES = -I$(MRUBY_SRC_DIR) -I$(MRUBY_SRC_DIR)/../include
+INCLUDES = -I$(MRB_SRC_DIR) -I$(MRB_SRC_DIR)/../include
 
 # Note: we found that when compiling mruby using double,
 # the unit test String#to_f [15.2.10.5.39] would fail, since
@@ -56,12 +75,12 @@ js : $(JS_EXECUTABLE)
 
 # NOTE: current version of emscripten would emit an exception if we
 # use -O1 or -O2 here
-$(JS_EXECUTABLE) : $(MRUBY_LIB) $(OBJ_MAIN)
-	$(LL) $(ALL_CFLAGS) $(OBJ_MAIN) $(MRUBY_LIB) -o $@
+$(JS_EXECUTABLE) : $(MRB_LIB) $(OBJ_MAIN)
+	$(LL) $(ALL_CFLAGS) $(OBJ_MAIN) $(MRB_LIB) -o $@
 
 .PHONY : webpage
-webpage : $(MRUBY_LIB) $(OBJ_MAIN)
-	$(LL) $(ALL_CFLAGS) $(OBJ_MAIN) $(MRUBY_LIB) -o $(WEBPAGE)
+webpage : $(MRB_LIB) $(OBJ_MAIN)
+	$(LL) $(ALL_CFLAGS) $(OBJ_MAIN) $(MRB_LIB) -o $(WEBPAGE)
 
 $(OBJ_MAIN) : $(SRC_MAIN)
 	$(CC) $(ALL_CFLAGS) -MMD $(INCLUDES) -c $< -o $@
@@ -69,37 +88,58 @@ $(OBJ_MAIN) : $(SRC_MAIN)
 $(SRC_MAIN) : $(SRC_CTMP) $(SRC_DRIVER)
 	cat $(SRC_DRIVER) $(SRC_CTMP) > $(SRC_MAIN)
 
-$(SRC_CTMP) : $(SRC_RBTMP) $(MRBC)
-	$(MRBC) -Bapp_irep -o$@ $(SRC_RBTMP)
+$(SRC_CTMP) : $(SRC_RBTMP) $(MRB_MRBC)
+	$(MRB_MRBC) -Bapp_irep -o$@ $(SRC_RBTMP)
 
 # entrypoint file comes last
 $(SRC_RBTMP) : $(SRC_ENTRYPOINT) $(SRC_REST)
 	cat $(SRC_REST) $(SRC_ENTRYPOINT) > $(SRC_RBTMP)
 
-$(MRUBY_LIB) : mruby
+############################
+# mruby build targets, rules
 
-$(MRBC) : mruby
+MRB_GENERAL_FLAGS = CC=$(CC) LL=$(LL) AR=$(AR) CP=cp CAT=cat ALL_CFLAGS='$(ALL_CFLAGS)' ENABLE_GEMS='$(ENABLE_GEMS)' ACTIVE_GEMS='$(ACTIVE_GEMS)'
 
-# mruby build, this target would generate 3 different files:
-# build/mrbc, build/libmruby.so and build/last-commit.txt
-# We put them in a single target for simplicity
+MRB_MAKE_FLAGS = $(MRB_GENERAL_FLAGS)
+
 .PHONY : mruby
-mruby :
-	@./scripts/rebuild_mruby_module
+mruby : $(MRB_LIB)
 
-# mruby tests. Note this is the test for mruby itself running
-# in JavaScript. It should only used by developers of webruby.
-# It does not test the mruby code!
+$(MRB_LIB) : $(MRB_MRBC) $(MRB_CORE_LIB)
+	make -C $(MRB_LIB_DIR) $(MRB_MAKE_FLAGS)
+
+$(MRB_MRBC) : $(MRB_MRBC_JS)
+	cp scripts/mrbc $(MRB_MRBC) && touch $(MRB_MRBC)
+
+$(MRB_MRBC_JS) : $(MRB_CORE_LIB)
+	make -C $(MRB_MRBC_DIR) $(MRB_MAKE_FLAGS) EXE=$(BASE_DIR)/$(MRB_MRBC_JS)
+
+$(MRB_CORE_LIB) :
+	make -C $(MRB_SRC_DIR) $(MRB_MAKE_FLAGS)
+
+#################################
+# mruby test build targets, rules
+
+# one test case in exception.rb tests the case of a very
+# deeply recursive function, which needs a lot of memory
+MRB_TEST_FLAGS = $(MRB_GENERAL_FLAGS) LDFLAGS='-s ALLOW_MEMORY_GROWTH=1'
+
+# Note this is the test for mruby itself running in JavaScript.
+# Normally it shall only be useful for developers of webruby.
+# It does not test the actual mruby code in src folder!
 .PHONY : mruby-test
-mruby-test :
-	@./scripts/rebuild_mruby_module test
+mruby-test : $(MRB_TEST_TARGET)
 	@echo "Running mruby test in Node.js!"
-	node $(MRUBY_TEST_TARGET)
+	node $(MRB_TEST_TARGET)
+
+$(MRB_TEST_TARGET) : $(MRB_LIB) $(MRB_MRBC)
+	make -C $(MRB_TEST_DIR) $(MRB_TEST_FLAGS) EXE=$(MRB_TEST_TARGET) $(MRB_TEST_TARGET)
 
 # clean up
 .PHONY : clean
 clean :
 	rm -f $(JS_EXECUTABLE) $(WEBPAGE)
 	rm -f $(OBJ_MAIN) $(SRC_MAIN) $(SRC_CTMP) $(SRC_RBTMP)
-	rm -f $(MRUBY_TEST_TARGET) $(MRUBY_FILES)
-	make -C $(MRUBY_PATH) clean
+	rm -f $(MRB_TEST_TARGET) $(MRB_FILES)
+	rm -f $(MRB_MRBC_JS)
+	make -C $(MRB_DIR) clean
