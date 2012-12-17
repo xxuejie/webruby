@@ -25,21 +25,7 @@ MRB_LIB := $(MRB_DIR)/lib/libmruby.a
 MRB_MRBC := $(MRB_DIR)/bin/mrbc
 MRB_MRBC_JS := $(MRB_DIR)/bin/mrbc.js
 
-# sources
-SRC_DIR := ./src
-SRC_ENTRYPOINT := $(SRC_DIR)/app.rb
-SRC_REST := $(filter-out $(SRC_ENTRYPOINT),$(wildcard $(SRC_DIR)/*.rb))
-SRC_DRIVER := $(SRC_DIR)/driver.c
-
-SRC_RBTMP := $(BUILD_DIR)/rbcode.rb
-SRC_CTMP := $(BUILD_DIR)/rbcode.c
-SRC_MAIN := $(BUILD_DIR)/main.c
-OBJ_MAIN := $(BUILD_DIR)/main.o
-
-# final js executable(or html page)
-JS_EXECUTABLE := $(BUILD_DIR)/mruby.js
-WEBPAGE := $(BUILD_DIR)/mruby.html
-
+# mrbgems settings
 ifeq ($(strip $(ENABLE_GEMS)),)
   # by default GEMs are deactivated
   ENABLE_GEMS = false
@@ -49,9 +35,6 @@ ifeq ($(strip $(ACTIVE_GEMS)),)
   # the default file which contains the active GEMs
   ACTIVE_GEMS = GEMS.active
 endif
-
-# libraries, includes
-INCLUDES = -I$(MRB_SRC_DIR) -I$(MRB_SRC_DIR)/../include
 
 # Note: we found that when compiling mruby using double,
 # the unit test String#to_f [15.2.10.5.39] would fail, since
@@ -64,82 +47,51 @@ INCLUDES = -I$(MRB_SRC_DIR) -I$(MRB_SRC_DIR)/../include
 ALL_CFLAGS = -Werror-implicit-function-declaration \
 	-DMRB_USE_FLOAT
 
-##############################
-# generic build targets, rules
-
-.PHONY : all
-all : js
-
-.PHONY : js
-js : $(JS_EXECUTABLE)
-
 # NOTE: current version of emscripten would emit an exception if we
-# use -O1 or -O2 here
-$(JS_EXECUTABLE) : $(MRB_LIB) $(OBJ_MAIN)
-	$(LL) $(ALL_CFLAGS) $(OBJ_MAIN) $(MRB_LIB) -o $@
-
-.PHONY : webpage
-webpage : $(MRB_LIB) $(OBJ_MAIN)
-	$(LL) $(ALL_CFLAGS) $(OBJ_MAIN) $(MRB_LIB) -o $(WEBPAGE)
-
-$(OBJ_MAIN) : $(SRC_MAIN)
-	$(CC) $(ALL_CFLAGS) -MMD $(INCLUDES) -c $< -o $@
-
-$(SRC_MAIN) : $(SRC_CTMP) $(SRC_DRIVER)
-	cat $(SRC_DRIVER) $(SRC_CTMP) > $(SRC_MAIN)
-
-$(SRC_CTMP) : $(SRC_RBTMP) $(MRB_MRBC)
-	$(MRB_MRBC) -Bapp_irep -o$@ $(SRC_RBTMP)
-
-# entrypoint file comes last
-$(SRC_RBTMP) : $(SRC_ENTRYPOINT) $(SRC_REST)
-	cat $(SRC_REST) $(SRC_ENTRYPOINT) > $(SRC_RBTMP)
-
-############################
-# mruby build targets, rules
-
+# use -O1 or -O2 optimizations, so we do not add any link flags here.
 MRB_GENERAL_FLAGS = CC=$(CC) LL=$(LL) AR=$(AR) CP=cp CAT=cat ALL_CFLAGS='$(ALL_CFLAGS)' ENABLE_GEMS='$(ENABLE_GEMS)' ACTIVE_GEMS='$(ACTIVE_GEMS)'
 
 MRB_MAKE_FLAGS = $(MRB_GENERAL_FLAGS)
-
-.PHONY : mruby
-mruby : $(MRB_LIB)
-
-$(MRB_LIB) : $(MRB_MRBC) $(MRB_CORE_LIB)
-	make -C $(MRB_LIB_DIR) $(MRB_MAKE_FLAGS)
-
-$(MRB_MRBC) : $(MRB_MRBC_JS)
-	cp scripts/mrbc $(MRB_MRBC) && touch $(MRB_MRBC)
-
-$(MRB_MRBC_JS) : $(MRB_CORE_LIB)
-	make -C $(MRB_MRBC_DIR) $(MRB_MAKE_FLAGS) EXE=$(BASE_DIR)/$(MRB_MRBC_JS)
-
-$(MRB_CORE_LIB) :
-	make -C $(MRB_SRC_DIR) $(MRB_MAKE_FLAGS)
-
-#################################
-# mruby test build targets, rules
 
 # one test case in exception.rb tests the case of a very
 # deeply recursive function, which needs a lot of memory
 MRB_TEST_FLAGS = $(MRB_GENERAL_FLAGS) LDFLAGS='-s ALLOW_MEMORY_GROWTH=1'
 
+
+##############################
+# generic build targets, rules
+
+.PHONY : all
+all: $(MRB_LIB) $(MRB_MRBC)
+	make -C src $(MRB_GENERAL_FLAGS)
+
+.PHONY : webpage
+webpage: $(MRB_LIB) $(MRB_MRBC)
+	make -C src webpage $(MRB_GENERAL_FLAGS)
+
+$(MRB_LIB) : $(MRB_MRBC)
+	make -C $(MRB_LIB_DIR) $(MRB_MAKE_FLAGS)
+
+# if mrbc.js does not change, do not copy this file over once again
+$(MRB_MRBC) : $(MRB_MRBC_JS)
+	cp scripts/mrbc $(MRB_MRBC) && touch $(MRB_MRBC)
+
+$(MRB_MRBC_JS) :
+	make -C $(MRB_SRC_DIR) $(MRB_MAKE_FLAGS)
+	make -C $(MRB_MRBC_DIR) $(MRB_MAKE_FLAGS) EXE=$(BASE_DIR)/$(MRB_MRBC_JS)
+
 # Note this is the test for mruby itself running in JavaScript.
 # Normally it shall only be useful for developers of webruby.
 # It does not test the actual mruby code in src folder!
 .PHONY : mruby-test
-mruby-test : $(MRB_TEST_TARGET)
+mruby-test : all
+	make -C $(MRB_TEST_DIR) $(MRB_TEST_FLAGS) EXE=$(MRB_TEST_TARGET) $(MRB_TEST_TARGET)
 	@echo "Running mruby test in Node.js!"
 	node $(MRB_TEST_TARGET)
-
-$(MRB_TEST_TARGET) : $(MRB_LIB) $(MRB_MRBC)
-	make -C $(MRB_TEST_DIR) $(MRB_TEST_FLAGS) EXE=$(MRB_TEST_TARGET) $(MRB_TEST_TARGET)
 
 # clean up
 .PHONY : clean
 clean :
-	rm -f $(JS_EXECUTABLE) $(WEBPAGE)
-	rm -f $(OBJ_MAIN) $(SRC_MAIN) $(SRC_CTMP) $(SRC_RBTMP)
-	rm -f $(MRB_TEST_TARGET) $(MRB_FILES)
-	rm -f $(MRB_MRBC_JS)
-	make -C $(MRB_DIR) clean
+	rm -f $(MRB_TEST_TARGET) $(MRB_MRBC_JS)
+	make -C src clean $(MRB_MAKE_FLAGS)
+	make -C $(MRB_DIR) clean $(MRB_MAKE_FLAGS)
