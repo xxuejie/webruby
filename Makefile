@@ -62,23 +62,16 @@ MRB_TEST_FLAGS = $(MRB_GENERAL_FLAGS) LDFLAGS='-s ALLOW_MEMORY_GROWTH=1'
 # generic build targets, rules
 
 .PHONY : all
-all: $(MRB_LIB) $(MRB_MRBC)
+all:
+	make -C $(MRB_SRC_DIR) $(MRB_MAKE_FLAGS)
+	make -q -C $(MRB_MRBC_DIR) $(MRB_MAKE_FLAGS) EXE=$(BASE_DIR)/$(MRB_MRBC_JS) || (cp scripts/mrbc $(MRB_MRBC) && touch $(MRB_MRBC))
+	make -C $(MRB_MRBC_DIR) $(MRB_MAKE_FLAGS) EXE=$(BASE_DIR)/$(MRB_MRBC_JS)
+	make -C $(MRB_LIB_DIR) $(MRB_MAKE_FLAGS)
 	make -C src $(MRB_GENERAL_FLAGS)
 
 .PHONY : webpage
-webpage: $(MRB_LIB) $(MRB_MRBC)
+webpage: all
 	make -C src webpage $(MRB_GENERAL_FLAGS)
-
-$(MRB_LIB) : $(MRB_MRBC)
-	make -C $(MRB_LIB_DIR) $(MRB_MAKE_FLAGS)
-
-# if mrbc.js does not change, do not copy this file over once again
-$(MRB_MRBC) : $(MRB_MRBC_JS)
-	cp scripts/mrbc $(MRB_MRBC) && touch $(MRB_MRBC)
-
-$(MRB_MRBC_JS) :
-	make -C $(MRB_SRC_DIR) $(MRB_MAKE_FLAGS)
-	make -C $(MRB_MRBC_DIR) $(MRB_MAKE_FLAGS) EXE=$(BASE_DIR)/$(MRB_MRBC_JS)
 
 # Note this is the test for mruby itself running in JavaScript.
 # Normally it shall only be useful for developers of webruby.
