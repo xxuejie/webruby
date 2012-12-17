@@ -11,19 +11,20 @@ export AR = $(EMSCRIPTEN_DIR)/emar
 
 BUILD_DIR := ./build
 
-MRB_DIR := ./modules/mruby
-MRB_SRC_DIR := $(MRB_DIR)/src
-MRB_MRBC_DIR := $(MRB_DIR)/tools/mrbc
-MRB_LIB_DIR := $(MRB_DIR)/mrblib
-MRB_TEST_DIR := $(MRB_DIR)/test
+MRUBY_ROOT := ./modules/mruby
+MRB_SRC_DIR := $(MRUBY_ROOT)/src
+MRB_MRBC_DIR := $(MRUBY_ROOT)/tools/mrbc
+MRB_LIB_DIR := $(MRUBY_ROOT)/mrblib
+MRB_GEMS_DIR := $(MRUBY_ROOT)/mrbgems
+MRB_TEST_DIR := $(MRUBY_ROOT)/test
 
 # mruby files
 MRB_TEST_TARGET := $(BASE_DIR)/$(BUILD_DIR)/mrbtest.js
 
-MRB_CORE_LIB := $(MRB_DIR)/lib/libmruby_core.a
-MRB_LIB := $(MRB_DIR)/lib/libmruby.a
-MRB_MRBC := $(MRB_DIR)/bin/mrbc
-MRB_MRBC_JS := $(MRB_DIR)/bin/mrbc.js
+MRB_CORE_LIB := $(MRUBY_ROOT)/lib/libmruby_core.a
+MRB_LIB := $(MRUBY_ROOT)/lib/libmruby.a
+MRB_MRBC := $(MRUBY_ROOT)/bin/mrbc
+MRB_MRBC_JS := $(MRUBY_ROOT)/bin/mrbc.js
 
 # mrbgems settings
 ifeq ($(strip $(ENABLE_GEMS)),)
@@ -66,6 +67,12 @@ all:
 	make -C $(MRB_SRC_DIR) $(MRB_MAKE_FLAGS)
 	make -q -C $(MRB_MRBC_DIR) $(MRB_MAKE_FLAGS) EXE=$(BASE_DIR)/$(MRB_MRBC_JS) || (cp scripts/mrbc $(MRB_MRBC) && touch $(MRB_MRBC))
 	make -C $(MRB_MRBC_DIR) $(MRB_MAKE_FLAGS) EXE=$(BASE_DIR)/$(MRB_MRBC_JS)
+ifeq ($(ENABLE_GEMS),true)
+	@echo "-- MAKE mrbgems --"
+# This is a temporary fix, once https://github.com/mruby/mruby/pull/634 is accepted, we can get rid of this
+	make -C $(MRB_GEMS_DIR) $(BASE_DIR)/modules/mruby/mrbgems/generator CC_FLAGS='-Wall -Werror-implicit-function-declaration -g -O3 -MMD -I. -I./../include'
+	make -C $(MRB_GEMS_DIR) $(MRB_MAKE_FLAGS)
+endif
 	make -C $(MRB_LIB_DIR) $(MRB_MAKE_FLAGS)
 	make -C src $(MRB_GENERAL_FLAGS)
 
@@ -87,4 +94,4 @@ mruby-test : all
 clean :
 	rm -f $(MRB_TEST_TARGET) $(MRB_MRBC_JS)
 	make -C src clean $(MRB_MAKE_FLAGS)
-	make -C $(MRB_DIR) clean $(MRB_MAKE_FLAGS)
+	make -C $(MRUBY_ROOT) clean $(MRB_MAKE_FLAGS)

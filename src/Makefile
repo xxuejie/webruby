@@ -1,5 +1,27 @@
 # Makefile for webruby application source code
 
+# We separate the two Makefile for two reasons:
+# 1. Simplicty
+# 2. mrbgems library files detection
+
+MRUBY_ROOT := ../modules/mruby
+
+ifeq ($(strip $(ENABLE_GEMS)),)
+  # by default GEMs are deactivated
+  ENABLE_GEMS = false
+endif
+
+ifeq ($(ENABLE_GEMS),false)
+  GEM_ARCHIVE_FILES =
+else
+  MAKEFILE_GEM_LIST := $(MRUBY_ROOT)/mrbgems/g/MakefileGemList
+  ifeq ($(wildcard $(MAKEFILE_GEM_LIST)),)
+    GEM_ARCHIVE_FILES =
+  else
+    include $(MAKEFILE_GEM_LIST)
+  endif
+endif
+
 BUILD_DIR := ../build
 
 # sources
@@ -18,10 +40,9 @@ JS_EXECUTABLE := $(BUILD_DIR)/mruby.js
 WEBPAGE := $(BUILD_DIR)/mruby.html
 
 # mruby
-MRB_DIR := ../modules/mruby
-MRB_SRC_DIR := $(MRB_DIR)/src
-MRB_LIB := $(MRB_DIR)/lib/libmruby.a
-MRB_MRBC := $(MRB_DIR)/bin/mrbc
+MRB_SRC_DIR := $(MRUBY_ROOT)/src
+MRB_LIB := $(MRUBY_ROOT)/lib/libmruby.a
+MRB_MRBC := $(MRUBY_ROOT)/bin/mrbc
 
 # libraries, includes
 INCLUDES = -I$(MRB_SRC_DIR) -I$(MRB_SRC_DIR)/../include
@@ -35,12 +56,12 @@ all : js
 .PHONY : js
 js : $(JS_EXECUTABLE)
 
-$(JS_EXECUTABLE) : $(OBJ_MAIN)
-	$(LL) $(ALL_CFLAGS) $(OBJ_MAIN) $(MRB_LIB) -o $@
+$(JS_EXECUTABLE) : $(OBJ_MAIN) $(MRB_LIB) $(GEM_ARCHIVE_FILES)
+	$(LL) $(ALL_CFLAGS) $(OBJ_MAIN) $(MRB_LIB) $(GEM_ARCHIVE_FILES) -o $@
 
 .PHONY : webpage
-webpage : $(OBJ_MAIN)
-	$(LL) $(ALL_CFLAGS) $(OBJ_MAIN) $(MRB_LIB) -o $(WEBPAGE)
+webpage : $(OBJ_MAIN) $(MRB_LIB) $(GEM_ARCHIVE_FILES)
+	$(LL) $(ALL_CFLAGS) $(OBJ_MAIN) $(MRB_LIB) $(GEM_ARCHIVE_FILES) -o $(WEBPAGE)
 
 $(OBJ_MAIN) : $(SRC_MAIN)
 	$(CC) $(ALL_CFLAGS) -MMD $(INCLUDES) -c $< -o $@
