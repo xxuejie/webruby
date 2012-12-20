@@ -25,6 +25,10 @@ While providing JavaScript file for Node.js, `webruby` can also generate html pa
     $ make webpage
     $ open build/mruby.html
 
+**For Mac users**: The latest version of emscripten uses `python2` as the default python interpreter. If you are using a Mac and rely on the default python. Please add a link from `python` to `python2` before building:
+
+    $ sudo ln -s /usr/bin/python /usr/bin/python2
+
 # Notes
 
 This project is still in a immature state! It still contains a lot of bugs and I'm now working to fix them. Feel free to write to me(xxuejie@gmail.com) if you have any comments or find any bugs. I would really appreciate it:)
