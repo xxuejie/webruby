@@ -50,17 +50,16 @@ INCLUDES = -I$(MRB_SRC_DIR) -I$(MRB_SRC_DIR)/../include
 ##############################
 # generic build targets, rules
 
-.PHONY : all
-all : js
-
 .PHONY : js
 js : $(JS_EXECUTABLE)
 
 $(JS_EXECUTABLE) : $(OBJ_MAIN) $(MRB_LIB) $(GEM_ARCHIVE_FILES)
 	$(LL) $(ALL_CFLAGS) $(OBJ_MAIN) $(MRB_LIB) $(GEM_ARCHIVE_FILES) -o $@
 
-.PHONY : webpage
-webpage : $(OBJ_MAIN) $(MRB_LIB) $(GEM_ARCHIVE_FILES)
+.PHONY : html
+html : $(WEBPAGE)
+
+$(WEBPAGE) : $(OBJ_MAIN) $(MRB_LIB) $(GEM_ARCHIVE_FILES)
 	$(LL) $(ALL_CFLAGS) $(OBJ_MAIN) $(MRB_LIB) $(GEM_ARCHIVE_FILES) -o $(WEBPAGE)
 
 $(OBJ_MAIN) : $(SRC_MAIN)
