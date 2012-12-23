@@ -8,14 +8,16 @@ ifeq ($(strip $(ENABLE_GEMS)),)
   ENABLE_GEMS = false
 endif
 
+ACTIVE_GEMS = $(realpath ./GEMS.active)
+
 .PHONY : all
 all :
-	ENABLE_GEMS=$(ENABLE_GEMS) $(RAKE)
+	ENABLE_GEMS=$(ENABLE_GEMS) ACTIVE_GEMS=$(ACTIVE_GEMS) $(RAKE)
 
 .PHONY : mruby_test
 mruby_test :
-	ENABLE_GEMS=$(ENABLE_GEMS) $(RAKE) mruby_test
+	ENABLE_GEMS=$(ENABLE_GEMS) ACTIVE_GEMS=$(ACTIVE_GEMS) $(RAKE) mruby_test
 
 .PHONY : clean
 clean :
-	ENABLE_GEMS=$(ENABLE_GEMS) $(RAKE) clean
+	ENABLE_GEMS=$(ENABLE_GEMS) ACTIVE_GEMS=$(ACTIVE_GEMS) $(RAKE) clean

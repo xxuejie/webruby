@@ -106,5 +106,5 @@ desc "clean up"
 task :clean do
     sh "rm -rf #{MRUBY_TEST_TARGET} #{MRUBY_MRBC_JS}"
     sh "make -C src clean #{MAKE_FLAGS}"
-  sh "ENABLE_GEMS=true ACTIVE_GEMS=#{ACTIVE_GEMS} make -C #{MRUBY_ROOT} clean #{MAKE_FLAGS}"
+    sh "ENABLE_GEMS=true ACTIVE_GEMS=#{ACTIVE_GEMS} make -C #{MRUBY_ROOT} clean #{MAKE_FLAGS}"
 end
