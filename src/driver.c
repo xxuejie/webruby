@@ -16,7 +16,6 @@ extern const char app_irep[];
 int main(int argc, char *argv[])
 {
   mrb_state *mrb;
-  mrb_value return_value;
   int ret = EXIT_SUCCESS;
 
   /* create new interpreter instance */
@@ -31,7 +30,7 @@ int main(int argc, char *argv[])
   if (mrb->exc) {
     /* an exception occurs */
     fprintf(stderr, "An exception occurs when running mruby bytecodes!\n");
-    mrb_p(mrb, return_value);
+    mrb_p(mrb, mrb_obj_value(mrb->exc));
     mrb->exc = 0;
     ret = EXIT_FAILURE;
   }
