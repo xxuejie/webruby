@@ -96,7 +96,7 @@ task :html => [:js] do
 end
 
 desc "build and run mruby tests, notice this is not testing your code in src folder!"
-task :mruby_test => [:js] do
+task :mrbtest => [:js] do
     sh "make -C #{MRUBY_TEST_DIR} #{TEST_FLAGS} EXE=#{MRUBY_TEST_TARGET} #{MRUBY_TEST_TARGET}"
     puts "Running mruby test in Node.js!"
     sh "node #{MRUBY_TEST_TARGET}"

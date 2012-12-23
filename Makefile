@@ -15,8 +15,8 @@ all :
 	ENABLE_GEMS=$(ENABLE_GEMS) ACTIVE_GEMS=$(ACTIVE_GEMS) $(RAKE)
 
 .PHONY : mruby_test
-mruby_test :
-	ENABLE_GEMS=$(ENABLE_GEMS) ACTIVE_GEMS=$(ACTIVE_GEMS) $(RAKE) mruby_test
+mrbtest :
+	ENABLE_GEMS=$(ENABLE_GEMS) ACTIVE_GEMS=$(ACTIVE_GEMS) $(RAKE) mrbtest
 
 .PHONY : clean
 clean :
