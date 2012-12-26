@@ -7,6 +7,10 @@ RAKE = ruby ./modules/mruby/minirake
 all :
 	$(RAKE)
 
+.PHONY : html
+html:
+	$(RAKE) html
+
 .PHONY : mruby_test
 mrbtest :
 	$(RAKE) mrbtest

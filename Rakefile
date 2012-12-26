@@ -92,7 +92,7 @@ end
 
 desc "build html target"
 task :html => [:js] do
-    sh "make -C src html #{MAKE_FLAGS}"
+    sh "make -C src html #{MAKE_FLAGS} EMCC_LDFLAGS=\"#{LDFLAGS.join(' ')} #{EMCC_LDFLAGS.join(' ')}\""
 end
 
 desc "build and run mruby tests, notice this is not testing your code in src folder!"
