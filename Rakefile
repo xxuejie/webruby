@@ -77,7 +77,17 @@ TEST_FLAGS = "#{GENERAL_FLAGS} LDFLAGS=\"#{LDFLAGS.join(' ')} #{EMCC_LDFLAGS.joi
 task :default => :js
 
 desc "build js targets and all dependencies"
-task :js do
+task :js => [:libmruby] do
+  sh "make -C src #{MAKE_FLAGS} EMCC_LDFLAGS=\"#{LDFLAGS.join(' ')} #{EMCC_LDFLAGS.join(' ')}\""
+end
+
+desc "build html target"
+task :html => [:libmruby] do
+    sh "make -C src html #{MAKE_FLAGS} EMCC_LDFLAGS=\"#{LDFLAGS.join(' ')} #{EMCC_LDFLAGS.join(' ')}\""
+end
+
+desc "build mruby libraries"
+task :libmruby do
   sh "make -C #{MRUBY_SRC_DIR} #{MAKE_FLAGS}"
   sh "make -q -C #{MRUBY_MRBC_DIR} #{MAKE_FLAGS} EXE=#{MRUBY_MRBC_JS_ABSOLUTE} || (cp scripts/mrbc #{MRUBY_MRBC} && touch #{MRUBY_MRBC})"
   sh "make -C #{MRUBY_MRBC_DIR} #{MAKE_FLAGS} EXE=#{MRUBY_MRBC_JS_ABSOLUTE}"
@@ -87,16 +97,10 @@ task :js do
     sh "ruby scripts/gen_lib.rb GEMS.active #{MRUBY_GEMS_JS_FILE}"
   end
   sh "make -C #{MRUBY_LIB_DIR} #{MAKE_FLAGS}"
-  sh "make -C src #{MAKE_FLAGS} EMCC_LDFLAGS=\"#{LDFLAGS.join(' ')} #{EMCC_LDFLAGS.join(' ')}\""
-end
-
-desc "build html target"
-task :html => [:js] do
-    sh "make -C src html #{MAKE_FLAGS} EMCC_LDFLAGS=\"#{LDFLAGS.join(' ')} #{EMCC_LDFLAGS.join(' ')}\""
 end
 
 desc "build and run mruby tests, notice this is not testing your code in src folder!"
-task :mrbtest => [:js] do
+task :mrbtest => [:libmruby] do
     sh "make -C #{MRUBY_TEST_DIR} #{TEST_FLAGS} EXE=#{MRUBY_TEST_TARGET} #{MRUBY_TEST_TARGET}"
     puts "Running mruby test in Node.js!"
     sh "node #{MRUBY_TEST_TARGET}"
