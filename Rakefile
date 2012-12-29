@@ -35,8 +35,8 @@ MRUBY_GEMS_TASK_FILE = File.join(MRUBY_GEMS_DIR, 'build_tasks')
 # mrbgems setting
 ENABLE_GEMS = ENV['ENABLE_GEMS'] == 'true'
 
-# active gems file, by default use the gems file provided by webruby
-ACTIVE_GEMS = ENV['ACTIVE_GEMS'] || File.join(BASE_DIR, 'GEMS.active')
+# active gems file, by default use the gems file in mruby folder
+ACTIVE_GEMS = ENV['ACTIVE_GEMS'] || File.join(MRUBY_GEMS_DIR, 'GEMS.active')
 
 # Note: we found that when compiling mruby using double,
 # the unit test String#to_f [15.2.10.5.39] would fail, since
@@ -94,7 +94,7 @@ task :libmruby do
   if ENABLE_GEMS
     puts "-- MAKE mrbgems --"
     Rake::Task['mrbgems_all'].invoke
-    sh "ruby scripts/gen_lib.rb GEMS.active #{MRUBY_GEMS_JS_FILE}"
+    sh "ruby scripts/gen_lib.rb #{ACTIVE_GEMS} #{MRUBY_GEMS_JS_FILE}"
   end
   sh "make -C #{MRUBY_LIB_DIR} #{MAKE_FLAGS}"
 end
