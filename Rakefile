@@ -69,7 +69,7 @@ GENERAL_FLAGS = "CC='#{CC}' LL='#{LL}' AR='#{AR}' YACC='#{YACC}' CP=cp CAT=cat C
 MAKE_FLAGS = "#{GENERAL_FLAGS} LDFLAGS=\"#{LDFLAGS.join(' ')}\""
 # one test case in exception.rb tests the case of a very
 # deeply recursive function, which needs a lot of memory
-TEST_FLAGS = "#{GENERAL_FLAGS} LDFLAGS=\"#{LDFLAGS.join(' ')} #{EMCC_LDFLAGS.join(' ')} -s ALLOW_MEMORY_GROWTH=1\""
+TEST_FLAGS = "#{GENERAL_FLAGS} LDFLAGS=\"#{LDFLAGS.join(' ')} #{EMCC_LDFLAGS.join(' ')} -s TOTAL_MEMORY=33554432\""
 
 ##############################
 # generic build targets, rules
