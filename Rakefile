@@ -32,6 +32,10 @@ MRUBY_MRBC_JS_ABSOLUTE = File.expand_path(MRUBY_MRBC_JS)
 
 MRUBY_GEMS_TASK_FILE = File.join(MRUBY_GEMS_DIR, 'build_tasks')
 
+# build helper scripts
+SCRIPTS_DIR = File.join(BASE_DIR, 'scripts')
+EXPORTED_FUNCTION_SCRIPT_FILE = File.join(SCRIPTS_DIR, 'gen_exported_functions')
+
 # mrbgems setting
 ENABLE_GEMS = ENV['ENABLE_GEMS'] == 'true'
 
@@ -57,6 +61,9 @@ EMCC_LDFLAGS = []
 
 if ENABLE_GEMS
   EMCC_LDFLAGS << "--js-library #{MRUBY_GEMS_JS_FILE}"
+
+  require EXPORTED_FUNCTION_SCRIPT_FILE
+  EMCC_LDFLAGS << gen_exported_funcs_arg(ACTIVE_GEMS)
 
   require MRUBY_GEMS_TASK_FILE
   Rake::Task[:load_mrbgems_flags].invoke
