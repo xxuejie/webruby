@@ -21,7 +21,7 @@ LIBMRUBY_FILE = File.join(MRUBY_DIR, LIBMRUBY)
 
 # Specify supported loading modes of webruby, see rakelib/functions.rb file
 # for details, by default all 3 loading modes are supported
-LOAD_MODE = ENV['LOAD_MODE'] || 2
+LOADING_MODE = ENV['LOADING_MODE'] || 2
 
 CFLAGS = %w(-DMRB_USE_FLOAT -Wall -Werror-implicit-function-declaration)
 CFLAGS << "-I#{MRUBY_DIR}/include"
@@ -40,6 +40,6 @@ desc "cleanup"
 task :clean do |t|
   sh "cd #{MRUBY_DIR} && CONFIG=#{MRUBY_BUILD_CONFIG} ./minirake clean"
   sh "rm -f #{BUILD_DIR}/app.c #{BUILD_DIR}/app.o #{BUILD_DIR}/rbcode.rb #{BUILD_DIR}/rbcode.c #{BUILD_DIR}/main.o"
-  sh "rm -f #{BUILD_DIR}/gem_library.js #{BUILD_DIR}/functions"
+  sh "rm -f #{BUILD_DIR}/gem_library.js #{BUILD_DIR}/functions #{BUILD_DIR}/post.js"
   sh "rm -f #{BUILD_DIR}/mruby.js #{BUILD_DIR}/mruby_exe.js"
 end

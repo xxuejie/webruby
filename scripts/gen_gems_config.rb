@@ -85,7 +85,7 @@ FileUtils.cd(MRUBY_DIR) do
   if (!File.exists?(OUTPUT_JS_FILE)) ||
       (!FileUtils.compare_file(OUTPUT_JS_FILE, OUTPUT_JS_TEMP_FILE))
     # only copys the file if it does not match the original one
-    puts 'Creating new js file!'
+    puts 'Creating new js library file!'
     FileUtils.cp(OUTPUT_JS_TEMP_FILE, OUTPUT_JS_FILE)
   end
   FileUtils.rm(OUTPUT_JS_TEMP_FILE)
