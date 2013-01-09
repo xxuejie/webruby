@@ -70,9 +70,9 @@ __EOF__
   if (!webruby.run_source) {
     webruby.run_source = function(mrb, src) {
       var stack = Runtime.stackSave();
-      var addr = Runtime.stackAlloc(bc.length);
+      var addr = Runtime.stackAlloc(src.length);
       var ret;
-      writeStringToMemory(bc, addr);
+      writeStringToMemory(src, addr);
 
       ret = _webruby_internal_run_source(mrb, addr);
 
