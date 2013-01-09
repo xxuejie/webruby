@@ -18,6 +18,8 @@ MRUBY_BUILD_CONFIG = File.join(BASE_DIR, 'build_config.rb')
 MRBC = File.join(MRUBY_DIR, %w[build host bin mrbc])
 LIBMRUBY = File.join(%w[build emscripten lib libmruby.a])
 LIBMRUBY_FILE = File.join(MRUBY_DIR, LIBMRUBY)
+MRBTEST = File.join(%w[build emscripten test mrbtest])
+MRBTEST_FILE = File.join(MRUBY_DIR, MRBTEST)
 
 # Specify supported loading modes of webruby, see rakelib/functions.rb file
 # for details, by default all 3 loading modes are supported
@@ -36,10 +38,14 @@ task :default => :js
 task :js => "#{BUILD_DIR}/mruby.js"
 task :js_exe => ["#{BUILD_DIR}/mruby_exe.js"]
 
+task :mrbtest => "#{BUILD_DIR}/mrbtest.js" do |t|
+  sh "node #{BUILD_DIR}/mrbtest.js"
+end
+
 desc "cleanup"
-task :clean do |t|
-  sh "cd #{MRUBY_DIR} && CONFIG=#{MRUBY_BUILD_CONFIG} ./minirake clean"
+task :clean => [:libmruby_clean] do |t|
   sh "rm -f #{BUILD_DIR}/app.c #{BUILD_DIR}/app.o #{BUILD_DIR}/rbcode.rb #{BUILD_DIR}/rbcode.c #{BUILD_DIR}/main.o"
   sh "rm -f #{BUILD_DIR}/gem_library.js #{BUILD_DIR}/functions #{BUILD_DIR}/post.js"
   sh "rm -f #{BUILD_DIR}/mruby.js #{BUILD_DIR}/mruby_exe.js"
+  sh "rm -f #{BUILD_DIR}/mrbtest.js #{BUILD_DIR}/mrbtest.bc"
 end

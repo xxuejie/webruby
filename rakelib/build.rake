@@ -23,3 +23,11 @@ file "#{BUILD_DIR}/post.js" => :post_js
 task :post_js do |t|
   sh "ruby scripts/gen_post.rb #{LOADING_MODE} #{BUILD_DIR}/post.js"
 end
+
+file "#{BUILD_DIR}/mrbtest.js" => "#{BUILD_DIR}/mrbtest.bc" do |t|
+  sh "#{LD} #{BUILD_DIR}/mrbtest.bc -o #{BUILD_DIR}/mrbtest.js -s TOTAL_MEMORY=33554432"
+end
+
+file "#{BUILD_DIR}/mrbtest.bc" => "#{MRBTEST_FILE}" do |t|
+  sh "cp #{MRBTEST_FILE} #{BUILD_DIR}/mrbtest.bc"
+end
