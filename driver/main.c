@@ -1,5 +1,5 @@
 /*
- * driver - driver for loading mruby source code
+ * main - main file used for testing
  */
 
 #include <stdio.h>
@@ -10,8 +10,7 @@
 #include "mruby/string.h"
 #include "mruby/proc.h"
 
-/* The generated mruby bytecodes are stored in this array */
-extern const char app_irep[];
+int webruby_internal_run(mrb_state* mrb);
 
 int main(int argc, char *argv[])
 {
@@ -26,7 +25,7 @@ int main(int argc, char *argv[])
   }
 
   /* load bytecode */
-  mrb_load_irep(mrb, app_irep);
+  webruby_internal_run(mrb);
   if (mrb->exc) {
     /* an exception occurs */
     fprintf(stderr, "An exception occurs when running mruby bytecodes!\n");
