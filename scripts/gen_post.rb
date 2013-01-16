@@ -31,26 +31,26 @@ File.open(OUTPUT_JS_TEMP_FILE, 'w') do |f|
   f.puts <<__EOF__
 (function() {
   function WEBRUBY() {
-    var mrb = _mrb_open();
-    var ret = {};
-    ret['close'] = function() {
-      _mrb_close(mrb);
+    var instance = {};
+    instance.mrb = _mrb_open();
+    instance['close'] = function() {
+      _mrb_close(instance.mrb);
     };
-    ret['run'] = function() {
-      _webruby_internal_run(mrb);
+    instance['run'] = function() {
+      _webruby_internal_run(instance.mrb);
     };
 __EOF__
 
   if mode > 0
     # WEBRUBY.run_bytecode
     f.puts <<__EOF__
-    ret['run_bytecode'] = function(bc) {
+    instance['run_bytecode'] = function(bc) {
       var stack = Runtime.stackSave();
       var addr = Runtime.stackAlloc(bc.length);
       var ret;
       writeArrayToMemory(bc, addr);
 
-      ret = _webruby_internal_run_bytecode(mrb, addr);
+      ret = _webruby_internal_run_bytecode(instance.mrb, addr);
 
       Runtime.stackRestore(stack);
       return ret;
@@ -61,13 +61,13 @@ __EOF__
   if mode > 1
     # WEBRUBY.run_source
     f.puts <<__EOF__
-    ret['run_source'] = function(src) {
+    instance['run_source'] = function(src) {
       var stack = Runtime.stackSave();
       var addr = Runtime.stackAlloc(src.length);
       var ret;
       writeStringToMemory(src, addr);
 
-      ret = _webruby_internal_run_source(mrb, addr);
+      ret = _webruby_internal_run_source(instance.mrb, addr);
 
       Runtime.stackRestore(stack);
       return ret;
@@ -76,7 +76,7 @@ __EOF__
   end
 
   f.puts <<__EOF__
-    return ret;
+    return instance;
   };
 
   if (typeof window === 'object') {
