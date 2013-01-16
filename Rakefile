@@ -25,9 +25,17 @@ MRBTEST_FILE = File.join(MRUBY_DIR, MRBTEST)
 # for details, by default all 3 loading modes are supported
 LOADING_MODE = ENV['LOADING_MODE'] || 2
 
+# If OPT is 1, we will use -O2 mode when generating JavaScript file, by default
+# optimization is disabled
+OPT = ENV['OPT'] || 0
+
 CFLAGS = %w(-DMRB_USE_FLOAT -Wall -Werror-implicit-function-declaration)
 CFLAGS << "-I#{MRUBY_DIR}/include"
 LDFLAGS = []
+
+if OPT.to_i == 1
+  LDFLAGS << '-O2'
+end
 
 load 'app/app.rake'
 load 'driver/driver.rake'

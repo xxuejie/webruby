@@ -30,26 +30,21 @@ OUTPUT_JS_TEMP_FILE = "#{OUTPUT_JS_FILE}.tmp"
 File.open(OUTPUT_JS_TEMP_FILE, 'w') do |f|
   f.puts <<__EOF__
 (function() {
-  var g = (typeof window === 'object') ? (window) : (global);
-  g.WEBRUBY = g.WEBRUBY || {};
-  var webruby = g.WEBRUBY;
-
-  if (!webruby.open) {
-    webruby.open = _mrb_open;
-  }
-  if (!webruby.close) {
-    webruby.close = _mrb_close;
-  }
-  if (!webruby.run) {
-    webruby.run = _webruby_internal_run;
-  }
+  function WEBRUBY() {
+    var mrb = _mrb_open();
+    var ret = {};
+    ret['close'] = function() {
+      _mrb_close(mrb);
+    };
+    ret['run'] = function() {
+      _webruby_internal_run(mrb);
+    };
 __EOF__
 
   if mode > 0
     # WEBRUBY.run_bytecode
     f.puts <<__EOF__
-  if (!webruby.run_bytecode) {
-    webruby.run_bytecode = function(mrb, bc) {
+    ret['run_bytecode'] = function(bc) {
       var stack = Runtime.stackSave();
       var addr = Runtime.stackAlloc(bc.length);
       var ret;
@@ -60,15 +55,13 @@ __EOF__
       Runtime.stackRestore(stack);
       return ret;
     };
-  }
 __EOF__
   end
 
   if mode > 1
     # WEBRUBY.run_source
     f.puts <<__EOF__
-  if (!webruby.run_source) {
-    webruby.run_source = function(mrb, src) {
+    ret['run_source'] = function(src) {
       var stack = Runtime.stackSave();
       var addr = Runtime.stackAlloc(src.length);
       var ret;
@@ -79,11 +72,18 @@ __EOF__
       Runtime.stackRestore(stack);
       return ret;
     };
-  }
 __EOF__
   end
 
   f.puts <<__EOF__
+    return ret;
+  };
+
+  if (typeof window === 'object') {
+    window['WEBRUBY'] = WEBRUBY;
+  } else {
+    global['WEBRUBY'] = WEBRUBY;
+  }
 }) ();
 __EOF__
 end
