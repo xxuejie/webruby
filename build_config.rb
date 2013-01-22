@@ -19,10 +19,7 @@ MRuby::Toolchain.new(:emscripten) do |conf|
     cc.flags = (ENV['CFLAGS'] || %w(-DMRB_USE_FLOAT -Wall -Werror-implicit-function-declaration))
   end
 
-  conf.linker do |linker|
-    linker.command = File.join(EMSCRIPTEN_DIR, 'emcc')
-  end
-
+  conf.linker.command = File.join(EMSCRIPTEN_DIR, 'emcc')
   conf.archiver.command = File.join(EMSCRIPTEN_DIR, 'emar')
 end
 
