@@ -20,24 +20,27 @@ OUTPUT_FUNCTIONS_FILE = File.expand_path(ARGV[2])
 # monkey patch for getting mrbgem list
 $gems = []
 module MRuby
+  # Toolchain and Build classes are not used, we just
+  # add them here to prevent runtime error.
+  class Toolchain
+    def initialize(sym, &block)
+    end
+  end
+
   class Build
     def initialize(&block)
-      # This is omitted
     end
   end
 
   class CrossBuild
-    attr_accessor :cc, :cflags
-    attr_accessor :ld, :ldflags
-    attr_accessor :ar
-
     def initialize(name, &block)
       if name == "emscripten"
-        @cflags = []
-        @ldflags = []
-
         instance_eval(&block)
       end
+    end
+
+    def toolchain(sym)
+      # This is also for preventing errors
     end
 
     def gem(gemdir)

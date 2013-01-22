@@ -7,22 +7,28 @@ EMSCRIPTEN_DIR = File.join(BASE_DIR, %w[modules emscripten])
 
 # Original mruby build, we only use the generated mrbc file for this native build
 MRuby::Build.new do |conf|
-  conf.cc = ENV['CC'] || 'gcc'
-  conf.ld = ENV['LD'] || 'gcc'
-  conf.ar = ENV['AR'] || 'ar'
+  toolchain :gcc
+end
 
-  conf.cflags << (ENV['CFLAGS'] || %w(-g -O3 -Wall -Werror-implicit-function-declaration))
-  conf.ldflags << (ENV['LDFLAGS'] || %w(-lm))
+# Emscripten customized toolchain
+MRuby::Toolchain.new(:emscripten) do |conf|
+  toolchain :clang
+
+  conf.cc do |cc|
+    cc.command = File.join(EMSCRIPTEN_DIR, 'emcc')
+    cc.flags = (ENV['CFLAGS'] || %w(-DMRB_USE_FLOAT -Wall -Werror-implicit-function-declaration))
+  end
+
+  conf.linker do |linker|
+    linker.command = File.join(EMSCRIPTEN_DIR, 'emcc')
+  end
+
+  conf.archiver.command = File.join(EMSCRIPTEN_DIR, 'emar')
 end
 
 # Cross build for emscripten, adding your mrbgems here.
 MRuby::CrossBuild.new('emscripten') do |conf|
-  conf.cc = File.join(EMSCRIPTEN_DIR, 'emcc')
-  conf.ld = File.join(EMSCRIPTEN_DIR, 'emcc')
-  conf.ar = File.join(EMSCRIPTEN_DIR, 'emar')
-
-  conf.cflags << (ENV['CFLAGS'] || %w(-DMRB_USE_FLOAT -Wall -Werror-implicit-function-declaration))
-  conf.ldflags << (ENV['LDFLAGS'] || %w(-lm))
+  toolchain :emscripten
 
   # You can add new mrbgem at here!
   # A few commonly used gems are listed here(but commented),
