@@ -43,8 +43,8 @@ load 'driver/driver.rake'
 # tasks
 task :default => :js
 
-task :js => "#{BUILD_DIR}/mruby.js"
-task :js_exe => ["#{BUILD_DIR}/mruby_exe.js"]
+task :js => "#{BUILD_DIR}/webruby.js"
+task :js_bin => ["#{BUILD_DIR}/webruby_bin.js"]
 
 task :mrbtest => "#{BUILD_DIR}/mrbtest.js" do |t|
   sh "node #{BUILD_DIR}/mrbtest.js"
@@ -54,6 +54,6 @@ desc "cleanup"
 task :clean => [:libmruby_clean] do |t|
   sh "rm -f #{BUILD_DIR}/app.c #{BUILD_DIR}/app.o #{BUILD_DIR}/rbcode.rb #{BUILD_DIR}/rbcode.c #{BUILD_DIR}/main.o"
   sh "rm -f #{BUILD_DIR}/gem_library.js #{BUILD_DIR}/functions #{BUILD_DIR}/post.js"
-  sh "rm -f #{BUILD_DIR}/mruby.js #{BUILD_DIR}/mruby_exe.js"
+  sh "rm -f #{BUILD_DIR}/webruby.js #{BUILD_DIR}/webruby_bin.js"
   sh "rm -f #{BUILD_DIR}/mrbtest.js #{BUILD_DIR}/mrbtest.bc"
 end

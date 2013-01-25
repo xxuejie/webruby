@@ -1,15 +1,15 @@
 require 'functions'
 
-file "#{BUILD_DIR}/mruby_exe.js" => ["#{BUILD_DIR}/main.o", "#{BUILD_DIR}/app.o", "#{BUILD_DIR}/gem_library.js", "#{BUILD_DIR}/post.js", "#{LIBMRUBY_FILE}"] do |t|
+file "#{BUILD_DIR}/webruby_bin.js" => ["#{BUILD_DIR}/main.o", "#{BUILD_DIR}/app.o", "#{BUILD_DIR}/gem_library.js", "#{BUILD_DIR}/post.js", "#{LIBMRUBY_FILE}"] do |t|
   func_arg = get_exported_arg("#{BUILD_DIR}/functions", LOADING_MODE, ['main'])
 
-  sh "#{LD} #{BUILD_DIR}/main.o #{BUILD_DIR}/app.o #{LIBMRUBY_FILE} -o #{BUILD_DIR}/mruby_exe.js --js-library #{BUILD_DIR}/gem_library.js --post-js #{BUILD_DIR}/post.js #{func_arg} #{LDFLAGS.join(' ')}"
+  sh "#{LD} #{BUILD_DIR}/main.o #{BUILD_DIR}/app.o #{LIBMRUBY_FILE} -o #{BUILD_DIR}/webruby_bin.js --js-library #{BUILD_DIR}/gem_library.js --post-js #{BUILD_DIR}/post.js #{func_arg} #{LDFLAGS.join(' ')}"
 end
 
-file "#{BUILD_DIR}/mruby.js" => ["#{BUILD_DIR}/app.o", "#{BUILD_DIR}/gem_library.js", "#{BUILD_DIR}/post.js", "#{LIBMRUBY_FILE}"] do |t|
+file "#{BUILD_DIR}/webruby.js" => ["#{BUILD_DIR}/app.o", "#{BUILD_DIR}/gem_library.js", "#{BUILD_DIR}/post.js", "#{LIBMRUBY_FILE}"] do |t|
   func_arg = get_exported_arg("#{BUILD_DIR}/functions", LOADING_MODE, [])
 
-  sh "#{LD} #{BUILD_DIR}/app.o #{LIBMRUBY_FILE} -o #{BUILD_DIR}/mruby.js --js-library #{BUILD_DIR}/gem_library.js --post-js #{BUILD_DIR}/post.js #{func_arg} #{LDFLAGS.join(' ')}"
+  sh "#{LD} #{BUILD_DIR}/app.o #{LIBMRUBY_FILE} -o #{BUILD_DIR}/webruby.js --js-library #{BUILD_DIR}/gem_library.js --post-js #{BUILD_DIR}/post.js #{func_arg} #{LDFLAGS.join(' ')}"
 end
 
 file "#{BUILD_DIR}/gem_library.js" => "#{LIBMRUBY_FILE}" do |t|
