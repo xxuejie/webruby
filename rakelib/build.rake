@@ -13,7 +13,7 @@ file "#{BUILD_DIR}/webruby.js" => ["#{BUILD_DIR}/app.o", "#{BUILD_DIR}/gem_libra
 end
 
 file "#{BUILD_DIR}/gem_library.js" => "#{LIBMRUBY_FILE}" do |t|
-  sh "ruby scripts/gen_gems_config.rb #{MRUBY_BUILD_CONFIG} #{BUILD_DIR}/gem_library.js #{BUILD_DIR}/functions"
+  sh "ruby scripts/gen_gems_config.rb #{WEBRUBY_BUILD_CONFIG} #{BUILD_DIR}/gem_library.js #{BUILD_DIR}/functions"
 end
 
 file "#{BUILD_DIR}/post.js" => :post_js

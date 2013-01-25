@@ -14,7 +14,7 @@ CC = File.join(EMSCRIPTEN_DIR, 'emcc')
 LD = File.join(EMSCRIPTEN_DIR, 'emcc')
 AR = File.join(EMSCRIPTEN_DIR, 'emar')
 
-MRUBY_BUILD_CONFIG = File.join(BASE_DIR, 'build_config.rb')
+WEBRUBY_BUILD_CONFIG = File.join(BASE_DIR, 'build_config.rb')
 MRBC = File.join(MRUBY_DIR, %w[build host bin mrbc])
 LIBMRUBY = File.join(%w[build emscripten lib libmruby.a])
 LIBMRUBY_FILE = File.join(MRUBY_DIR, LIBMRUBY)
