@@ -4,3 +4,6 @@
 [submodule "modules/emscripten"]
 	path = modules/emscripten
 	url = git://github.com/kripken/emscripten.git
+[submodule "modules/mrubymix"]
+	path = modules/mrubymix
+	url = git://github.com/xxuejie/mrubymix.git

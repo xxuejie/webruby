@@ -21,6 +21,8 @@ LIBMRUBY_FILE = File.join(MRUBY_DIR, LIBMRUBY)
 MRBTEST = File.join(%w[build emscripten test mrbtest])
 MRBTEST_FILE = File.join(MRUBY_DIR, MRBTEST)
 
+MRUBYMIX = File.join(BASE_DIR, %w[modules mrubymix bin mrubymix])
+
 # Specify supported loading modes of webruby, see rakelib/functions.rb file
 # for details, by default all 3 loading modes are supported
 LOADING_MODE = ENV['LOADING_MODE'] || 2

@@ -17,11 +17,5 @@ file "#{BUILD_DIR}/rbcode.c" => ["#{BUILD_DIR}/rbcode.rb", "#{MRBC}"] do |t|
 end
 
 file "#{BUILD_DIR}/rbcode.rb" => app_files do |t|
-  # Puts the entrypoint file at the end of the list
-  if (i = app_files.index(ENTRYPOINT_FILE))
-    last_i = app_files.length - 1
-    app_files[i], app_files[last_i] = app_files[last_i], app_files[i]
-  end
-
-  sh "cat #{app_files.join(' ')} > #{BUILD_DIR}/rbcode.rb"
+  sh "ruby #{MRUBYMIX} #{ENTRYPOINT_FILE} #{BUILD_DIR}/rbcode.rb"
 end
