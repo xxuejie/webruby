@@ -2,8 +2,7 @@
 # We expose this file here to let users adding mrbgems using the same
 # method as in mruby
 
-BASE_DIR = File.expand_path(File.dirname(__FILE__))
-EMSCRIPTEN_DIR = File.join(BASE_DIR, %w[modules emscripten])
+EMSCRIPTEN_DIR = ENV['EMSCRIPTEN_DIR']
 
 # Original mruby build, we only use the generated mrbc file for this native build
 MRuby::Build.new do |conf|
