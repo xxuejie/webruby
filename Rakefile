@@ -27,16 +27,18 @@ MRUBYMIX = File.join(BASE_DIR, %w[modules mrubymix bin mrubymix])
 # for details, by default all 3 loading modes are supported
 LOADING_MODE = ENV['LOADING_MODE'] || 2
 
-# If OPT is 1, we will use -O2 mode when generating JavaScript file, by default
-# optimization is disabled
-OPT = ENV['OPT'] || 0
+CLOSURE = ENV['CLOSURE'] || 0
 
 CFLAGS = %w(-DMRB_USE_FLOAT -Wall -Werror-implicit-function-declaration)
 CFLAGS << "-I#{MRUBY_DIR}/include"
-LDFLAGS = []
+# We use -O2 mode by default since this is not too slow, the closure optimization
+# is thus disabled in development mode
+LDFLAGS = %w(-O2)
 
-if OPT.to_i == 1
-  LDFLAGS << '-O2'
+if CLOSURE.to_i == 1
+  LDFLAGS << '--closure 1'
+else
+  LDFLAGS << '--closure 0'
 end
 
 load 'app/app.rake'
