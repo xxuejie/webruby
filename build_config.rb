@@ -22,6 +22,9 @@ end
 MRuby::CrossBuild.new('emscripten') do |conf|
   toolchain :emscripten
 
+  # Use standard Time class
+  conf.gem 'mgems/mruby-time'
+
   # You can add new mrbgem at here!
   # A few commonly used gems are listed here(but commented),
   # you can simply uncomment the corresponding lines if you want to use them.
