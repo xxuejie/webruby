@@ -29,7 +29,7 @@ LOADING_MODE = ENV['LOADING_MODE'] || 2
 
 CLOSURE = ENV['CLOSURE'] || 0
 
-CFLAGS = %w(-Wall -Werror-implicit-function-declaration)
+CFLAGS = %w(-DMRB_USE_FLOAT -Wall -Werror-implicit-function-declaration)
 CFLAGS << "-I#{MRUBY_DIR}/include"
 # We use -O2 mode by default since this is not too slow, the closure optimization
 # is thus disabled in development mode
