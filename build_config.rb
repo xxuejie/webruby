@@ -22,8 +22,11 @@ end
 MRuby::CrossBuild.new('emscripten') do |conf|
   toolchain :emscripten
 
+  # Use standard Math module
+  conf.gem 'mrbgems/mruby-math'
+
   # Use standard Time class
-  conf.gem 'mgems/mruby-time'
+  conf.gem 'mrbgems/mruby-time'
 
   # You can add new mrbgem at here!
   # A few commonly used gems are listed here(but commented),
