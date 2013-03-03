@@ -5,7 +5,7 @@ BASE_DIR = File.expand_path(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(BASE_DIR, *%w[rakelib]))
 
 BUILD_DIR = File.join(BASE_DIR, %w[build])
-EMSCRIPTEN_DIR = File.join(BASE_DIR, %w[modules emscripten])
+EMSCRIPTEN_DIR = ENV['EMSCRIPTEN_DIR'] || File.join(BASE_DIR, %w[modules emscripten])
 MRUBY_DIR = File.join(BASE_DIR, %w[modules mruby])
 APP_DIR = File.join(BASE_DIR, %w[app])
 DRIVER_DIR = File.join(BASE_DIR, %w[driver])
@@ -29,7 +29,7 @@ LOADING_MODE = ENV['LOADING_MODE'] || 2
 
 CLOSURE = ENV['CLOSURE'] || 0
 
-CFLAGS = %w(-DMRB_USE_FLOAT -Wall -Werror-implicit-function-declaration)
+CFLAGS = %w(-Wall -Werror-implicit-function-declaration)
 CFLAGS << "-I#{MRUBY_DIR}/include"
 # We use -O2 mode by default since this is not too slow, the closure optimization
 # is thus disabled in development mode

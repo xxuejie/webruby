@@ -11,7 +11,7 @@ MRuby::Toolchain.new(:emscripten) do |conf|
 
   conf.cc do |cc|
     cc.command = File.join(EMSCRIPTEN_DIR, 'emcc')
-    cc.flags = (ENV['CFLAGS'] || %w(-DMRB_USE_FLOAT -Wall -Werror-implicit-function-declaration))
+    cc.flags = (ENV['CFLAGS'] || %w(-Wall -Werror-implicit-function-declaration))
   end
 
   conf.linker.command = File.join(EMSCRIPTEN_DIR, 'emcc')
