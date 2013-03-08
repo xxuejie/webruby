@@ -28,6 +28,15 @@ MRuby::CrossBuild.new('emscripten') do |conf|
   # Use standard Time class
   conf.gem 'mrbgems/mruby-time'
 
+  # Use standard Struct class
+  conf.gem 'mrbgems/mruby-struct'
+
+  # Use standard Kernel#sprintf method
+  conf.gem 'mrbgems/mruby-sprintf'
+
+  # Use extensional String class
+  conf.gem 'mrbgems/mruby-string-ext'
+
   # You can add new mrbgem at here!
   # A few commonly used gems are listed here(but commented),
   # you can simply uncomment the corresponding lines if you want to use them.
