@@ -23,9 +23,7 @@ file "#{BUILD_DIR}/gem_append.js" => :gen_gems_config
 file "#{BUILD_DIR}/gem_test_library.js" => :gen_gems_config
 file "#{BUILD_DIR}/gem_test_append.js" => :gen_gems_config
 
-# TODO: here's a small problem: this task depends not only on libmruby.a, it also depends on all the JS files in each mrbgem. However, this cannot be detected
-# using existing mruby build config. It may also be too complicated to implement this separately(may need hacks into mruby build config). I will come back to this later.
-file :gen_gems_config => "#{LIBMRUBY_FILE}" do |t|
+task :gen_gems_config do |t|
   sh "ruby scripts/gen_gems_config.rb #{WEBRUBY_BUILD_CONFIG} #{BUILD_DIR}/gem_library.js #{BUILD_DIR}/gem_append.js #{BUILD_DIR}/gem_test_library.js #{BUILD_DIR}/gem_test_append.js #{BUILD_DIR}/functions"
 end
 
