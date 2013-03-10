@@ -1,21 +1,38 @@
 #!/usr/bin/env ruby
 
-# This script loops through all gems, and collect the JavaScript file to
-# append as well as functions to export.
+# This script loops through all gems to perform the following three tasks:
+# 1. Loop through 'js/lib' directory in each gem for JS libraries to include
+# 2. Loop through 'js/append' directory in each gem for JS files to append
+# 3. Loop through 'test/js/lib' directory of each gem for test libs to include
+# 2. Loop through 'test/js/append' directory in each gem for test files to append
+# 3. Collect functions to export for each gem
 
 require 'fileutils'
 
-if ARGV.length < 3
-  puts 'Usage: (path to build config) (output js file name) (output functions file name)'
+if ARGV.length < 6
+  puts 'Usage: (path to build config) (JS lib file name) (JS append file name) (test JS lib file name) (test JS append file name) (output functions file name)'
   exit 1
 end
 
 MRUBY_DIR = File.join(File.expand_path(File.dirname(__FILE__)), %w[.. modules mruby])
 
 CONFIG_FILE = File.expand_path(ARGV[0])
-OUTPUT_JS_FILE = File.expand_path(ARGV[1])
-OUTPUT_JS_TEMP_FILE = "#{OUTPUT_JS_FILE}.tmp"
-OUTPUT_FUNCTIONS_FILE = File.expand_path(ARGV[2])
+JS_LIB_FILE = File.expand_path(ARGV[1])
+JS_APPEND_FILE = File.expand_path(ARGV[2])
+TEST_JS_LIB_FILE = File.expand_path(ARGV[3])
+TEST_JS_APPEND_FILE = File.expand_path(ARGV[4])
+EXPORTED_FUNCTIONS_FILE = File.expand_path(ARGV[5])
+
+DIRECTORY_MAP = {
+  'js/lib' => JS_LIB_FILE,
+  'js/append' => JS_APPEND_FILE,
+  'test/js/lib' => TEST_JS_LIB_FILE,
+  'test/js/append' => TEST_JS_APPEND_FILE
+}
+
+def get_temp_file_name(filename)
+  "#{filename}.tmp"
+end
 
 # monkey patch for getting mrbgem list
 $gems = []
@@ -61,16 +78,21 @@ end
 FileUtils.cd(MRUBY_DIR) do
   load CONFIG_FILE
 
-  temp_js_file = File.open(OUTPUT_JS_TEMP_FILE, 'w')
+  file_map = {}
+  DIRECTORY_MAP.each do |k, v|
+    file_map[k] = File.open(get_temp_file_name(v), 'w')
+  end
   functions = []
 
   $gems.each do |gem|
     gem = gem.strip
 
-    # gather all prepending JavaScript files
-    Dir.glob(File.join(gem, %w[js *.js])) do |f|
-      temp_js_file.write("/* #{f} */\n")
-      temp_js_file.write(File.read(f))
+    # gather JavaScript files
+    file_map.each do |dir, tmp_f|
+      Dir.glob(File.join(gem, dir, '*.js')) do |f|
+        tmp_f.write("/* #{f} */\n")
+        tmp_f.write(File.read(f))
+      end
     end
 
     # gather exported functions
@@ -84,17 +106,20 @@ FileUtils.cd(MRUBY_DIR) do
   end
 
   # writes js file
-  temp_js_file.close
-  if (!File.exists?(OUTPUT_JS_FILE)) ||
-      (!FileUtils.compare_file(OUTPUT_JS_FILE, OUTPUT_JS_TEMP_FILE))
-    # only copys the file if it does not match the original one
-    puts 'Creating new js library file!'
-    FileUtils.cp(OUTPUT_JS_TEMP_FILE, OUTPUT_JS_FILE)
+  file_map.each { |k, f| f.close }
+
+  DIRECTORY_MAP.each do |dir, filename|
+    tmpname = get_temp_file_name(filename)
+    if (!File.exists?(filename)) ||
+        (!FileUtils.compare_file(filename, tmpname))
+      puts "Creating new file: #{filename}!"
+      FileUtils.cp(tmpname, filename)
+    end
+    FileUtils.rm(tmpname)
   end
-  FileUtils.rm(OUTPUT_JS_TEMP_FILE)
 
   # writes functions file
-  File.open(OUTPUT_FUNCTIONS_FILE, 'w') do |f|
+  File.open(EXPORTED_FUNCTIONS_FILE, 'w') do |f|
     functions.uniq.each do |func|
       f.write("#{func}\n")
     end
