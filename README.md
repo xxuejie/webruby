@@ -1,7 +1,7 @@
 # Introduction
 
 This project brings mruby to the browser. It uses [emscripten]
-(https://github.com/kripken/emscripten) to compiles the mruby source code into
+(https://github.com/kripken/emscripten) to compile the mruby source code into
 JavaScript and runs in the browser.
 
 Please refer to this [tutorial](http://qiezi.me/2013/01/09/webruby-1-2-3-tutorial/) for how to use webruby.
