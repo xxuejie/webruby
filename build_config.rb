@@ -5,6 +5,43 @@
 CURRENT_DIR = File.dirname(File.expand_path(__FILE__))
 EMSCRIPTEN_DIR = ENV['EMSCRIPTEN_DIR'] || File.join(CURRENT_DIR, %w[modules emscripten])
 
+# Native mruby build config for mrbc
+MRuby::Build.new do |conf|
+  # load specific toolchain settings
+  toolchain :gcc
+
+  # Use standard print/puts/p
+  conf.gem "#{root}/mrbgems/mruby-print"
+
+  # Use standard Math module
+  conf.gem "#{root}/mrbgems/mruby-math"
+
+  # Use standard Time class
+  conf.gem "#{root}/mrbgems/mruby-time"
+
+  # Use standard Struct class
+  conf.gem "#{root}/mrbgems/mruby-struct"
+
+  # Use standard Kernel#sprintf method
+  conf.gem "#{root}/mrbgems/mruby-sprintf"
+
+  # Use extensional Enumerable module
+  conf.gem "#{root}/mrbgems/mruby-enum-ext"
+
+  # Use extensional String class
+  conf.gem "#{root}/mrbgems/mruby-string-ext"
+
+  # Use extensional Numeric class
+  conf.gem "#{root}/mrbgems/mruby-numeric-ext"
+
+  # Use extensional Array class
+  conf.gem "#{root}/mrbgems/mruby-array-ext"
+
+  # Use extensional Hash class
+  conf.gem "#{root}/mrbgems/mruby-hash-ext"
+end
+
+
 # Emscripten customized toolchain
 MRuby::Toolchain.new(:emscripten) do |conf|
   toolchain :clang
@@ -22,20 +59,35 @@ end
 MRuby::CrossBuild.new('emscripten') do |conf|
   toolchain :emscripten
 
+  # Use standard print/puts/p
+  conf.gem "#{root}/mrbgems/mruby-print"
+
   # Use standard Math module
-  conf.gem 'mrbgems/mruby-math'
+  conf.gem "#{root}/mrbgems/mruby-math"
 
   # Use standard Time class
-  conf.gem 'mrbgems/mruby-time'
+  conf.gem "#{root}/mrbgems/mruby-time"
 
   # Use standard Struct class
-  conf.gem 'mrbgems/mruby-struct'
+  conf.gem "#{root}/mrbgems/mruby-struct"
 
   # Use standard Kernel#sprintf method
-  conf.gem 'mrbgems/mruby-sprintf'
+  conf.gem "#{root}/mrbgems/mruby-sprintf"
+
+  # Use extensional Enumerable module
+  conf.gem "#{root}/mrbgems/mruby-enum-ext"
 
   # Use extensional String class
-  conf.gem 'mrbgems/mruby-string-ext'
+  conf.gem "#{root}/mrbgems/mruby-string-ext"
+
+  # Use extensional Numeric class
+  conf.gem "#{root}/mrbgems/mruby-numeric-ext"
+
+  # Use extensional Array class
+  conf.gem "#{root}/mrbgems/mruby-array-ext"
+
+  # Use extensional Hash class
+  conf.gem "#{root}/mrbgems/mruby-hash-ext"
 
   # You can add new mrbgem at here!
   # A few commonly used gems are listed here(but commented),
@@ -50,5 +102,5 @@ MRuby::CrossBuild.new('emscripten') do |conf|
   # Normally we wouldn't use this example gem, I just put it here to show how to
   # add a gem on the local file system, you can either use absolute path or relative
   # path from mruby root, which is modules/webruby.
-  # conf.gem 'doc/mrbgems/c_and_ruby_extension_example'
+  # conf.gem "#{root}/examples/mrbgems/c_and_ruby_extension_example"
 end

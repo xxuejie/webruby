@@ -56,6 +56,10 @@ module MRuby
       end
     end
 
+    def root
+      MRUBY_DIR
+    end
+
     def toolchain(sym)
       # This is also for preventing errors
     end

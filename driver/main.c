@@ -3,6 +3,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "mruby.h"
 #include "mruby/irep.h"
