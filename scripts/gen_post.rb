@@ -31,6 +31,10 @@ File.open(OUTPUT_JS_TEMP_FILE, 'w') do |f|
   f.puts <<__EOF__
 (function() {
   function WEBRUBY(opts) {
+    if (!(this instanceof WEBRUBY)) {
+      // Well, this is not perfect, but it can at least cover some cases.
+      return new WEBRUBY(opts);
+    }
     opts = opts || {};
 
     // Default print level is errors only
