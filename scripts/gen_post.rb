@@ -30,54 +30,57 @@ OUTPUT_JS_TEMP_FILE = "#{OUTPUT_JS_FILE}.tmp"
 File.open(OUTPUT_JS_TEMP_FILE, 'w') do |f|
   f.puts <<__EOF__
 (function() {
-  function WEBRUBY() {
-    var instance = {};
-    instance.mrb = _mrb_open();
-    instance['close'] = function() {
-      _mrb_close(instance.mrb);
-    };
-    instance['run'] = function() {
-      _webruby_internal_run(instance.mrb);
-    };
+  function WEBRUBY(opts) {
+    opts = opts || {};
+
+    // Default print level is errors only
+    this.print_level = opts.print_level || 1;
+    this.mrb = _mrb_open();
+  };
+
+  WEBRUBY.prototype.close = function() {
+    _mrb_close(this.mrb);
+  };
+  WEBRUBY.prototype.run = function() {
+    _webruby_internal_run(this.mrb, this.print_level);
+  };
 __EOF__
 
   if mode > 0
     # WEBRUBY.run_bytecode
     f.puts <<__EOF__
-    instance['run_bytecode'] = function(bc) {
-      var stack = Runtime.stackSave();
-      var addr = Runtime.stackAlloc(bc.length);
-      var ret;
-      writeArrayToMemory(bc, addr);
+  WEBRUBY.prototype.run_bytecode = function(bc) {
+    var stack = Runtime.stackSave();
+    var addr = Runtime.stackAlloc(bc.length);
+    var ret;
+    writeArrayToMemory(bc, addr);
 
-      ret = _webruby_internal_run_bytecode(instance.mrb, addr);
+    ret = _webruby_internal_run_bytecode(this.mrb, addr, this.print_level);
 
-      Runtime.stackRestore(stack);
-      return ret;
-    };
+    Runtime.stackRestore(stack);
+    return ret;
+  };
 __EOF__
   end
 
   if mode > 1
     # WEBRUBY.run_source
     f.puts <<__EOF__
-    instance['run_source'] = function(src) {
-      var stack = Runtime.stackSave();
-      var addr = Runtime.stackAlloc(src.length);
-      var ret;
-      writeStringToMemory(src, addr);
+  WEBRUBY.prototype.run_source = function(src) {
+    var stack = Runtime.stackSave();
+    var addr = Runtime.stackAlloc(src.length);
+    var ret;
+    writeStringToMemory(src, addr);
 
-      ret = _webruby_internal_run_source(instance.mrb, addr);
+    ret = _webruby_internal_run_source(this.mrb, addr, this.print_level);
 
-      Runtime.stackRestore(stack);
-      return ret;
-    };
+    Runtime.stackRestore(stack);
+    return ret;
+  };
 __EOF__
   end
 
   f.puts <<__EOF__
-    return instance;
-  };
 
   if (typeof window === 'object') {
     window['WEBRUBY'] = WEBRUBY;

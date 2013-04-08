@@ -10,6 +10,9 @@ MRuby::Build.new do |conf|
   # load specific toolchain settings
   toolchain :gcc
 
+  # Use standard Kernel#sprintf method
+  conf.gem "#{root}/mrbgems/mruby-sprintf"
+
   # Use standard print/puts/p
   conf.gem "#{root}/mrbgems/mruby-print"
 
@@ -21,9 +24,6 @@ MRuby::Build.new do |conf|
 
   # Use standard Struct class
   conf.gem "#{root}/mrbgems/mruby-struct"
-
-  # Use standard Kernel#sprintf method
-  conf.gem "#{root}/mrbgems/mruby-sprintf"
 
   # Use extensional Enumerable module
   conf.gem "#{root}/mrbgems/mruby-enum-ext"
@@ -39,6 +39,12 @@ MRuby::Build.new do |conf|
 
   # Use extensional Hash class
   conf.gem "#{root}/mrbgems/mruby-hash-ext"
+
+  # Use Random class
+  conf.gem "#{root}/mrbgems/mruby-random"
+
+  # No use eval method
+  # conf.gem "#{root}/mrbgems/mruby-eval"
 end
 
 
@@ -59,6 +65,9 @@ end
 MRuby::CrossBuild.new('emscripten') do |conf|
   toolchain :emscripten
 
+  # Use standard Kernel#sprintf method
+  conf.gem "#{root}/mrbgems/mruby-sprintf"
+
   # Use standard print/puts/p
   conf.gem "#{root}/mrbgems/mruby-print"
 
@@ -70,9 +79,6 @@ MRuby::CrossBuild.new('emscripten') do |conf|
 
   # Use standard Struct class
   conf.gem "#{root}/mrbgems/mruby-struct"
-
-  # Use standard Kernel#sprintf method
-  conf.gem "#{root}/mrbgems/mruby-sprintf"
 
   # Use extensional Enumerable module
   conf.gem "#{root}/mrbgems/mruby-enum-ext"
@@ -88,6 +94,12 @@ MRuby::CrossBuild.new('emscripten') do |conf|
 
   # Use extensional Hash class
   conf.gem "#{root}/mrbgems/mruby-hash-ext"
+
+  # Use Random class
+  conf.gem "#{root}/mrbgems/mruby-random"
+
+  # No use eval method
+  # conf.gem "#{root}/mrbgems/mruby-eval"
 
   # You can add new mrbgem at here!
   # A few commonly used gems are listed here(but commented),
