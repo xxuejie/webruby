@@ -27,18 +27,18 @@ MRUBYMIX = File.join(BASE_DIR, %w[modules mrubymix bin mrubymix])
 # for details, by default all 3 loading modes are supported
 LOADING_MODE = ENV['LOADING_MODE'] || 2
 
-CLOSURE = ENV['CLOSURE'] || 0
+OPT = ENV['OPT'] || 0
 
 CFLAGS = %w(-Wall -Werror-implicit-function-declaration)
 CFLAGS << "-I#{MRUBY_DIR}/include"
 # We use -O2 mode by default since this is not too slow, the closure optimization
 # is thus disabled in development mode
-LDFLAGS = %w(-O2)
+LDFLAGS = []
 
-if CLOSURE.to_i == 1
-  LDFLAGS << '--closure 1'
+if OPT.to_i == 1
+  LDFLAGS << '-O2'
 else
-  LDFLAGS << '--closure 0'
+  LDFLAGS << '-O0'
 end
 
 load 'app/app.rake'
