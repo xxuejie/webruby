@@ -40,6 +40,15 @@ MRuby::Build.new do |conf|
   # Use extensional Hash class
   conf.gem "#{root}/mrbgems/mruby-hash-ext"
 
+  # Use extensional Range class
+  conf.gem "#{root}/mrbgems/mruby-range-ext"
+
+  # Use extensional Proc class
+  conf.gem "#{root}/mrbgems/mruby-proc-ext"
+
+  # Use extensional Symbol class
+  conf.gem "#{root}/mrbgems/mruby-symbol-ext"
+
   # Use Random class
   conf.gem "#{root}/mrbgems/mruby-random"
 
@@ -94,6 +103,15 @@ MRuby::CrossBuild.new('emscripten') do |conf|
 
   # Use extensional Hash class
   conf.gem "#{root}/mrbgems/mruby-hash-ext"
+
+  # Use extensional Range class
+  conf.gem "#{root}/mrbgems/mruby-range-ext"
+
+  # Use extensional Proc class
+  conf.gem "#{root}/mrbgems/mruby-proc-ext"
+
+  # Use extensional Symbol class
+  conf.gem "#{root}/mrbgems/mruby-symbol-ext"
 
   # Use Random class
   conf.gem "#{root}/mrbgems/mruby-random"

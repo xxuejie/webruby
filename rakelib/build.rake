@@ -36,7 +36,7 @@ task :gen_post do |t|
 end
 
 file "#{BUILD_DIR}/mrbtest.js" => ["#{BUILD_DIR}/mrbtest.bc"] + GEM_TEST_JS_FILES do |t|
-  sh "#{LD} #{BUILD_DIR}/mrbtest.bc -o #{BUILD_DIR}/mrbtest.js -s TOTAL_MEMORY=33554432 #{GEM_TEST_JS_FLAGS} #{LDFLAGS.join(' ')}"
+  sh "#{LD} #{BUILD_DIR}/mrbtest.bc -o #{BUILD_DIR}/mrbtest.js -s TOTAL_MEMORY=33554432 -s MAX_SETJMPS=128 #{GEM_TEST_JS_FLAGS} #{LDFLAGS.join(' ')}"
 end
 
 file "#{BUILD_DIR}/mrbtest.bc" => "#{MRBTEST_FILE}" do |t|
