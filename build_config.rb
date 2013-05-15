@@ -74,6 +74,7 @@ end
 MRuby::CrossBuild.new('emscripten') do |conf|
   toolchain :emscripten
 
+  # TODO: gembox
   # Use standard Kernel#sprintf method
   conf.gem "#{root}/mrbgems/mruby-sprintf"
 

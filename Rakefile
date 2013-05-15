@@ -23,6 +23,10 @@ MRBTEST_FILE = File.join(MRUBY_DIR, MRBTEST)
 
 MRUBYMIX = File.join(BASE_DIR, %w[modules mrubymix bin mrubymix])
 
+# the new le32-unknown-nacl triple has a limitation which will break
+# mruby build, we have to resort to the old i386 triple.
+ENV['EMCC_LLVM_TARGET'] = 'i386-pc-linux-gnu'
+
 # Specify supported loading modes of webruby, see rakelib/functions.rb file
 # for details, by default all 3 loading modes are supported
 LOADING_MODE = ENV['LOADING_MODE'] || 2
