@@ -11,7 +11,7 @@
 #include "mruby/string.h"
 #include "mruby/proc.h"
 
-int webruby_internal_run(mrb_state* mrb);
+int webruby_internal_run(mrb_state* mrb, int print_level);
 
 int main(int argc, char *argv[])
 {
@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
   }
 
   /* load bytecode */
-  webruby_internal_run(mrb);
+  webruby_internal_run(mrb, 1);
   if (mrb->exc) {
     /* an exception occurs */
     fprintf(stderr, "An exception occurs when running mruby bytecodes!\n");
