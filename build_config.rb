@@ -10,50 +10,7 @@ MRuby::Build.new do |conf|
   # load specific toolchain settings
   toolchain :gcc
 
-  # Use standard Kernel#sprintf method
-  conf.gem "#{root}/mrbgems/mruby-sprintf"
-
-  # Use standard print/puts/p
-  conf.gem "#{root}/mrbgems/mruby-print"
-
-  # Use standard Math module
-  conf.gem "#{root}/mrbgems/mruby-math"
-
-  # Use standard Time class
-  conf.gem "#{root}/mrbgems/mruby-time"
-
-  # Use standard Struct class
-  conf.gem "#{root}/mrbgems/mruby-struct"
-
-  # Use extensional Enumerable module
-  conf.gem "#{root}/mrbgems/mruby-enum-ext"
-
-  # Use extensional String class
-  conf.gem "#{root}/mrbgems/mruby-string-ext"
-
-  # Use extensional Numeric class
-  conf.gem "#{root}/mrbgems/mruby-numeric-ext"
-
-  # Use extensional Array class
-  conf.gem "#{root}/mrbgems/mruby-array-ext"
-
-  # Use extensional Hash class
-  conf.gem "#{root}/mrbgems/mruby-hash-ext"
-
-  # Use extensional Range class
-  conf.gem "#{root}/mrbgems/mruby-range-ext"
-
-  # Use extensional Proc class
-  conf.gem "#{root}/mrbgems/mruby-proc-ext"
-
-  # Use extensional Symbol class
-  conf.gem "#{root}/mrbgems/mruby-symbol-ext"
-
-  # Use Random class
-  conf.gem "#{root}/mrbgems/mruby-random"
-
-  # No use eval method
-  # conf.gem "#{root}/mrbgems/mruby-eval"
+  conf.gembox 'default'
 end
 
 
@@ -74,51 +31,7 @@ end
 MRuby::CrossBuild.new('emscripten') do |conf|
   toolchain :emscripten
 
-  # TODO: gembox
-  # Use standard Kernel#sprintf method
-  conf.gem "#{root}/mrbgems/mruby-sprintf"
-
-  # Use standard print/puts/p
-  conf.gem "#{root}/mrbgems/mruby-print"
-
-  # Use standard Math module
-  conf.gem "#{root}/mrbgems/mruby-math"
-
-  # Use standard Time class
-  conf.gem "#{root}/mrbgems/mruby-time"
-
-  # Use standard Struct class
-  conf.gem "#{root}/mrbgems/mruby-struct"
-
-  # Use extensional Enumerable module
-  conf.gem "#{root}/mrbgems/mruby-enum-ext"
-
-  # Use extensional String class
-  conf.gem "#{root}/mrbgems/mruby-string-ext"
-
-  # Use extensional Numeric class
-  conf.gem "#{root}/mrbgems/mruby-numeric-ext"
-
-  # Use extensional Array class
-  conf.gem "#{root}/mrbgems/mruby-array-ext"
-
-  # Use extensional Hash class
-  conf.gem "#{root}/mrbgems/mruby-hash-ext"
-
-  # Use extensional Range class
-  conf.gem "#{root}/mrbgems/mruby-range-ext"
-
-  # Use extensional Proc class
-  conf.gem "#{root}/mrbgems/mruby-proc-ext"
-
-  # Use extensional Symbol class
-  conf.gem "#{root}/mrbgems/mruby-symbol-ext"
-
-  # Use Random class
-  conf.gem "#{root}/mrbgems/mruby-random"
-
-  # No use eval method
-  # conf.gem "#{root}/mrbgems/mruby-eval"
+  conf.gembox 'full-core'
 
   # You can add new mrbgem at here!
   # A few commonly used gems are listed here(but commented),

@@ -49,6 +49,13 @@ module MRuby
     end
   end
 
+  GemBox = Object.new
+  class << GemBox
+    def new(&block); block.call(self); end
+    def config=(obj); @config = obj; end
+    def gem(gemdir, &block); @config.gem(gemdir, &block); end
+  end
+
   class CrossBuild
     def initialize(name, &block)
       if name == "emscripten"
@@ -64,17 +71,44 @@ module MRuby
       # This is also for preventing errors
     end
 
+    def gembox(gemboxfile)
+      gembox = File.expand_path("#{gemboxfile}.gembox", "#{root}/mrbgems")
+      fail "Can't find gembox '#{gembox}'" unless File.exists?(gembox)
+      GemBox.config = self
+      instance_eval File.read(gembox)
+    end
+
     def gem(gemdir)
-      gemdir = load_external_gem(gemdir) if gemdir.is_a?(Hash)
+      gemdir = load_hash_gem(gemdir) if gemdir.is_a?(Hash)
 
       # Collecting available gemdir
       $gems << gemdir if File.exists?(gemdir)
     end
 
-    def load_external_gem(params)
-      if params[:git]
-        "build/mrbgems/#{params[:git].match(/([-_\w]+)(\.[-_\w]+|)$/).to_a[1]}"
+    def load_hash_gem(params)
+      if params[:github]
+        params[:git] = "https://github.com/#{params[:github]}.git"
+      elsif params[:bitbucket]
+        params[:git] = "https://bitbucket.org/#{params[:bitbucket]}.git"
       end
+
+      if params[:core]
+        gemdir = "#{root}/mrbgems/#{params[:core]}"
+      elsif params[:git]
+        url = params[:git]
+        gemdir = "build/mrbgems/#{url.match(/([-\w]+)(\.[-\w]+|)$/).to_a[1]}"
+        return gemdir if File.exists?(gemdir)
+
+        options = [params[:options]] || []
+        options << "--branch \"#{params[:branch]}\"" if params[:branch]
+
+        FileUtils.mkdir_p "build/mrbgems"
+        git.run_clone gemdir, url, options
+      else
+        fail "unknown gem option #{params}"
+      end
+
+      gemdir
     end
   end
 end
