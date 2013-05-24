@@ -6,6 +6,10 @@ JavaScript and runs in the browser.
 
 Please refer to this [tutorial](http://qiezi.me/2013/01/09/webruby-1-2-3-tutorial/) for how to use webruby.
 
+# Build Status
+
+[![Build Status](https://drone.io/github.com/xxuejie/webruby/status.png)](https://drone.io/github.com/xxuejie/webruby/latest)
+
 # Notes
 
 Currently this is still a toy project. Though several demos have been created, it hasn't been used in a production environment. Feel free to play with this, but please give it a complete evaluation before using it in your real-world project.
