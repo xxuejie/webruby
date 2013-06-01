@@ -5,4 +5,6 @@ before_install:
   - sudo apt-get install llvm-3.2 clang-3.2 -y
   # Lets emcc sets up the environment
   - ./modules/emscripten/emcc
+  # Just copy-paste version of fix from https://github.com/travis-ci/travis-cookbooks/issues/155
+  - sudo rm -rf /dev/shm && sudo ln -s /run/shm /dev/shm
 script: "rake mrbtest"
