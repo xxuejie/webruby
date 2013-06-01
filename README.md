@@ -8,7 +8,7 @@ Please refer to this [tutorial](http://qiezi.me/2013/01/09/webruby-1-2-3-tutoria
 
 # Build Status
 
-[![Build Status](https://drone.io/github.com/xxuejie/webruby/status.png)](https://drone.io/github.com/xxuejie/webruby/latest)
+[![Build Status](https://travis-ci.org/xxuejie/webruby.png)](https://travis-ci.org/xxuejie/webruby)
 
 # Notes
 
