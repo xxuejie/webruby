@@ -1,7 +1,6 @@
+env: LLVM=/usr/lib/llvm-3.2/bin
 before_install:
   - sudo add-apt-repository ppa:h-rayflood/llvm -y
   - sudo apt-get update -y
   - sudo apt-get install llvm-3.2 clang-3.2 -y
-  - sudo ln -s /usr/bin/clang-3.2 /usr/bin/clang
-  - sudo ln -s /usr/bin/clang++-3.2 /usr/bin/clang++
 script: "rake mrbtest"
