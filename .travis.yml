@@ -3,4 +3,6 @@ before_install:
   - sudo add-apt-repository ppa:h-rayflood/llvm -y
   - sudo apt-get update -y
   - sudo apt-get install llvm-3.2 clang-3.2 -y
+  # Lets emcc sets up the environment
+  - ./modules/emscripten/emcc
 script: "rake mrbtest"
