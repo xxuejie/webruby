@@ -1,7 +1,5 @@
 before_install:
-  - sudo add-apt-repository ppa:staticfloat/julia-deps -y
+  - sudo add-apt-repository ppa:h-rayflood/llvm -y
   - sudo apt-get update -y
-  - sudo apt-get install llvm-3.2-dev -y
-  - sudo apt-get install bison -y
-  - git submodule update --init --recursive
+  - sudo apt-get install llvm-3.2 clang-3.2 -y
 script: "rake mrbtest"
