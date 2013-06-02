@@ -156,6 +156,19 @@ FileUtils.cd(MRUBY_DIR) do
   # writes js file
   file_map.each { |k, f| f.close }
 
+  ['js/append', 'js/lib'].each do |path|
+    name = get_temp_file_name(DIRECTORY_MAP[path])
+    test_name = get_temp_file_name(DIRECTORY_MAP["test/#{path}"])
+    tmp_test_name = "#{test_name}.orig"
+
+    FileUtils.mv(test_name, tmp_test_name)
+    File.open(test_name, 'w') do |f|
+      f.write(File.read(name))
+      f.write(File.read(tmp_test_name))
+    end
+    FileUtils.rm(tmp_test_name)
+  end
+
   DIRECTORY_MAP.each do |dir, filename|
     tmpname = get_temp_file_name(filename)
     if (!File.exists?(filename)) ||

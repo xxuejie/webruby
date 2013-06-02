@@ -3,8 +3,8 @@ require 'functions'
 GEM_JS_FILES = ["#{BUILD_DIR}/gem_library.js", "#{BUILD_DIR}/gem_append.js"]
 GEM_JS_FLAGS = "--js-library #{BUILD_DIR}/gem_library.js --post-js #{BUILD_DIR}/gem_append.js"
 
-GEM_TEST_JS_FILES = ["#{BUILD_DIR}/gem_test_library.js", "#{BUILD_DIR}/gem_test_append.js"] + GEM_JS_FILES
-GEM_TEST_JS_FLAGS = "#{GEM_JS_FLAGS} --js-library #{BUILD_DIR}/gem_test_library.js --post-js #{BUILD_DIR}/gem_test_append.js"
+GEM_TEST_JS_FILES = ["#{BUILD_DIR}/gem_test_library.js", "#{BUILD_DIR}/gem_test_append.js"]
+GEM_TEST_JS_FLAGS = "--js-library #{BUILD_DIR}/gem_test_library.js --post-js #{BUILD_DIR}/gem_test_append.js"
 
 file "#{BUILD_DIR}/webruby_bin.js" => ["#{BUILD_DIR}/main.o", "#{BUILD_DIR}/app.o", "#{LIBMRUBY_FILE}"] + GEM_JS_FILES do |t|
   func_arg = get_exported_arg("#{BUILD_DIR}/functions", LOADING_MODE, ['main'])
