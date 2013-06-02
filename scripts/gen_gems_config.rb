@@ -1,27 +1,29 @@
 #!/usr/bin/env ruby
 
 # This script loops through all gems to perform the following three tasks:
-# 1. Loop through 'js/lib' directory in each gem for JS libraries to include
-# 2. Loop through 'js/append' directory in each gem for JS files to append
-# 3. Loop through 'test/js/lib' directory of each gem for test libs to include
-# 2. Loop through 'test/js/append' directory in each gem for test files to append
-# 3. Collect functions to export for each gem
+# 1. Copy WEBRUBY API file to JS append file(this allows us to add WEBRUBY JS plugins)
+# 2. Loop through 'js/lib' directory in each gem for JS libraries to include
+# 3. Loop through 'js/append' directory in each gem for JS files to append
+# 4. Loop through 'test/js/lib' directory of each gem for test libs to include
+# 5. Loop through 'test/js/append' directory in each gem for test files to append
+# 6. Collect functions to export for each gem
 
 require 'fileutils'
 
 if ARGV.length < 6
-  puts 'Usage: (path to build config) (JS lib file name) (JS append file name) (test JS lib file name) (test JS append file name) (output functions file name)'
+  puts 'Usage: (path to build config) (path to WEBRUBY API file) (JS lib file name) (JS append file name) (test JS lib file name) (test JS append file name) (output functions file name)'
   exit 1
 end
 
 MRUBY_DIR = File.join(File.expand_path(File.dirname(__FILE__)), %w[.. modules mruby])
 
 CONFIG_FILE = File.expand_path(ARGV[0])
-JS_LIB_FILE = File.expand_path(ARGV[1])
-JS_APPEND_FILE = File.expand_path(ARGV[2])
-TEST_JS_LIB_FILE = File.expand_path(ARGV[3])
-TEST_JS_APPEND_FILE = File.expand_path(ARGV[4])
-EXPORTED_FUNCTIONS_FILE = File.expand_path(ARGV[5])
+WEBRUBY_API_FILE = File.expand_path(ARGV[1])
+JS_LIB_FILE = File.expand_path(ARGV[2])
+JS_APPEND_FILE = File.expand_path(ARGV[3])
+TEST_JS_LIB_FILE = File.expand_path(ARGV[4])
+TEST_JS_APPEND_FILE = File.expand_path(ARGV[5])
+EXPORTED_FUNCTIONS_FILE = File.expand_path(ARGV[6])
 
 DIRECTORY_MAP = {
   'js/lib' => JS_LIB_FILE,
@@ -32,6 +34,11 @@ DIRECTORY_MAP = {
 
 def get_temp_file_name(filename)
   "#{filename}.tmp"
+end
+
+def write_file_with_name(fd, file_to_write)
+  fd.write("/* #{file_to_write} */\n")
+  fd.write(File.read(file_to_write))
 end
 
 # monkey patch for getting mrbgem list
@@ -122,14 +129,17 @@ FileUtils.cd(MRUBY_DIR) do
   end
   functions = []
 
+  if File.exists? WEBRUBY_API_FILE
+    write_file_with_name(file_map['js/append'], WEBRUBY_API_FILE)
+  end
+
   $gems.each do |gem|
     gem = gem.strip
 
     # gather JavaScript files
     file_map.each do |dir, tmp_f|
       Dir.glob(File.join(gem, dir, '*.js')) do |f|
-        tmp_f.write("/* #{f} */\n")
-        tmp_f.write(File.read(f))
+        write_file_with_name(tmp_f, f)
       end
     end
 

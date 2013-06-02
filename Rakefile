@@ -61,7 +61,7 @@ end
 desc "cleanup"
 task :clean => [:libmruby_clean] do |t|
   sh "rm -f #{BUILD_DIR}/app.c #{BUILD_DIR}/app.o #{BUILD_DIR}/rbcode.rb #{BUILD_DIR}/rbcode.c #{BUILD_DIR}/main.o"
-  sh "rm -f #{BUILD_DIR}/gem_library.js #{BUILD_DIR}/gem_append.js #{BUILD_DIR}/gem_test_library.js #{BUILD_DIR}/gem_test_append.js #{BUILD_DIR}/functions #{BUILD_DIR}/post.js"
+  sh "rm -f #{BUILD_DIR}/gem_library.js #{BUILD_DIR}/gem_append.js #{BUILD_DIR}/gem_test_library.js #{BUILD_DIR}/gem_test_append.js #{BUILD_DIR}/functions #{BUILD_DIR}/js_api.js"
   sh "rm -f #{BUILD_DIR}/webruby.js #{BUILD_DIR}/webruby_bin.js"
   sh "rm -f #{BUILD_DIR}/mrbtest.js #{BUILD_DIR}/mrbtest.bc"
 end
