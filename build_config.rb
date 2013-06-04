@@ -31,11 +31,18 @@ end
 MRuby::CrossBuild.new('emscripten') do |conf|
   toolchain :emscripten
 
-  conf.gembox 'full-core'
+  # 'default' gembox does not include mruby-eval, which would otherwise bring
+  # all parsing code. We do not include this gem here to ensure the parsing code
+  # will be stripped in LOADING_MODE 0 and 1. Feel free to uncomment the eval
+  # line below if you want to use it.
+  conf.gembox 'default'
 
   # You can add new mrbgem at here!
   # A few commonly used gems are listed here(but commented),
   # you can simply uncomment the corresponding lines if you want to use them.
+
+  # mruby-eval gem, all parsing code will be packed into the final JS!
+  # conf.gem :core => "mruby-eval"
 
   # JavaScript calling interface
   # conf.gem :git => 'git://github.com/xxuejie/mruby-js.git', :branch => 'master'
