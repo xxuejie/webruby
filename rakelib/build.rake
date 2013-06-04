@@ -1,10 +1,10 @@
 require 'functions'
 
 GEM_JS_FILES = ["#{BUILD_DIR}/gem_library.js", "#{BUILD_DIR}/gem_append.js"]
-GEM_JS_FLAGS = "--js-library #{BUILD_DIR}/gem_library.js --post-js #{BUILD_DIR}/gem_append.js"
+GEM_JS_FLAGS = "--js-library #{BUILD_DIR}/gem_library.js --pre-js #{BUILD_DIR}/gem_append.js"
 
 GEM_TEST_JS_FILES = ["#{BUILD_DIR}/gem_test_library.js", "#{BUILD_DIR}/gem_test_append.js"]
-GEM_TEST_JS_FLAGS = "--js-library #{BUILD_DIR}/gem_test_library.js --post-js #{BUILD_DIR}/gem_test_append.js"
+GEM_TEST_JS_FLAGS = "--js-library #{BUILD_DIR}/gem_test_library.js --pre-js #{BUILD_DIR}/gem_test_append.js"
 
 file "#{BUILD_DIR}/webruby_bin.js" => ["#{BUILD_DIR}/main.o", "#{BUILD_DIR}/app.o", "#{LIBMRUBY_FILE}"] + GEM_JS_FILES do |t|
   func_arg = get_exported_arg("#{BUILD_DIR}/functions", LOADING_MODE, ['main'])
@@ -29,7 +29,10 @@ task :gen_gems_config do |t|
 end
 
 file "#{BUILD_DIR}/mrbtest.js" => ["#{BUILD_DIR}/mrbtest.bc"] + GEM_TEST_JS_FILES do |t|
-  sh "#{LD} #{BUILD_DIR}/mrbtest.bc -o #{BUILD_DIR}/mrbtest.js -s TOTAL_MEMORY=33554432 #{GEM_TEST_JS_FLAGS} #{LDFLAGS.join(' ')}"
+  # loading mode 0 is necessary for mrbtest
+  func_arg = get_exported_arg("#{BUILD_DIR}/functions", 0, ['main'])
+
+  sh "#{LD} #{BUILD_DIR}/mrbtest.bc -o #{BUILD_DIR}/mrbtest.js -s TOTAL_MEMORY=33554432 #{GEM_TEST_JS_FLAGS} #{func_arg} #{LDFLAGS.join(' ')}"
 end
 
 file "#{BUILD_DIR}/mrbtest.bc" => "#{MRBTEST_FILE}" do |t|
