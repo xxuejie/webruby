@@ -16,6 +16,8 @@ Please refer to this [tutorial](http://qiezi.me/2013/01/09/webruby-1-2-3-tutoria
 
 Currently this is still a toy project. Though several demos have been created, it hasn't been used in a production environment. Feel free to play with this, but please give it a complete evaluation before using it in your real-world project.
 
+**About LLVM**: Currently if you are installing LLVM using `homebrew`, the default version installed is `3.3`. However, `emscripten` only works with `3.2` nowadays. So you may want to go to [here](http://llvm.org/releases/download.html#3.2), download the binary pack for your OS, extracted and define a local environment variable `LLVM` containing the `bin` folder of the extracted files. This will tell `emscripten` to use this version of `LLVM`.
+
 **For Mac users**: The latest version of emscripten uses `python2` as the default python interpreter. If you are using a Mac and rely on the default python. Please add a link from `python` to `python2` before building:
 
     $ sudo ln -s /usr/bin/python /usr/bin/python2
