@@ -1,3 +1,4 @@
+[![Stories in Ready](http://badge.waffle.io/xxuejie/webruby.png)](http://waffle.io/xxuejie/webruby)  
 # Introduction
 
 This project brings mruby to the browser. It uses [emscripten]
