@@ -1,4 +1,3 @@
-[![Stories in Ready](http://badge.waffle.io/xxuejie/webruby.png)](http://waffle.io/xxuejie/webruby)  
 # Introduction
 
 This project brings mruby to the browser. It uses [emscripten]
@@ -12,6 +11,9 @@ Please refer to this [tutorial](http://qiezi.me/2013/01/09/webruby-1-2-3-tutoria
 [![Build Status](https://travis-ci.org/xxuejie/webruby.png)](https://travis-ci.org/xxuejie/webruby)
 [![Build Status](https://drone.io/github.com/xxuejie/webruby/status.png)](https://drone.io/github.com/xxuejie/webruby/latest)
 
+# Waffle State
+
+[![Stories in Ready](http://badge.waffle.io/xxuejie/webruby.png)](http://waffle.io/xxuejie/webruby)
 
 # Notes
 
