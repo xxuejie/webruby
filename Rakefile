@@ -35,13 +35,14 @@ OPT = ENV['OPT'] || 0
 
 CFLAGS = %w(-Wall -Werror-implicit-function-declaration)
 CFLAGS << "-I#{MRUBY_DIR}/include"
-# We use -O2 mode by default since this is not too slow, the closure optimization
-# is thus disabled in development mode
+
 LDFLAGS = []
 
 if OPT.to_i == 1
+  CFLAGS << '-O2'
   LDFLAGS << '-O2'
 else
+  CFLAGS << '-O0'
   LDFLAGS << '-O0'
 end
 
