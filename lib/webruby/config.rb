@@ -30,5 +30,24 @@ module Webruby
     def optimization_flag
       is_release_mode ? "-O2" : "-O0"
     end
+
+    def gembox_lines
+      generate_conf_lines(gemboxes, 'gembox')
+    end
+
+    def gem_lines
+      generate_conf_lines(gems, 'gem')
+    end
+
+    private
+    def generate_conf_lines(arr, option)
+      arr.map { |i| "conf.#{option}(#{format_gem(i)})"
+      }.inject { |a, b| "#{a}\n  #{b}" }
+    end
+
+    def format_gem(gem)
+      return gem if gem.is_a?(Hash)
+      "'#{gem}'"
+    end
   end
 end

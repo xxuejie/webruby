@@ -5,10 +5,12 @@ file "#{Webruby.build_dir}/gem_test_append.js" => :gen_gems_config
 
 task :gen_gems_config do |t|
   sh "ruby #{SCRIPT_GEN_POST} #{Webruby::App.config.loading_mode} #{Webruby.build_dir}/js_api.js"
-  sh "ruby #{SCRIPT_GEN_GEMS_CONFIG} #{Webruby.build_config} #{Webruby.build_dir}/js_api.js #{Webruby.build_dir}/gem_library.js #{Webruby.build_dir}/gem_append.js #{Webruby.build_dir}/gem_test_library.js #{Webruby.build_dir}/gem_test_append.js #{Webruby.build_dir}/functions"
+  sh "ruby #{SCRIPT_GEN_GEMS_CONFIG} #{Webruby.build_config} #{Webruby.build_dir}/js_api.js #{Webruby.build_dir}/gem_library.js #{Webruby.build_dir}/gem_append.js #{Webruby.build_dir}/gem_test_library.js #{Webruby.build_dir}/gem_test_append.js #{Webruby.build_dir}/functions #{Webruby.full_build_dir}/mruby/emscripten"
 end
 
-file "#{Webruby.build_dir}/rbcode.rb" => Webruby.rb_files do |t|
+file "#{Webruby.build_dir}/rbcode.rb" => ["#{Webruby.entrypoint_file}",
+                                          "#{Webruby.build_dir}"] +
+  Webruby.rb_files do |t|
   sh "ruby #{MRUBYMIX} #{Webruby.entrypoint_file} #{Webruby.build_dir}/rbcode.rb"
 end
 

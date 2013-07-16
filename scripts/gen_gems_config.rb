@@ -10,8 +10,8 @@
 
 require 'fileutils'
 
-if ARGV.length < 6
-  puts 'Usage: (path to build config) (path to WEBRUBY API file) (JS lib file name) (JS append file name) (test JS lib file name) (test JS append file name) (output functions file name)'
+if ARGV.length < 7
+  puts 'Usage: (path to build config) (path to WEBRUBY API file) (JS lib file name) (JS append file name) (test JS lib file name) (test JS append file name) (output functions file name) (mruby build output path)'
   exit 1
 end
 
@@ -24,6 +24,7 @@ JS_APPEND_FILE = File.expand_path(ARGV[3])
 TEST_JS_LIB_FILE = File.expand_path(ARGV[4])
 TEST_JS_APPEND_FILE = File.expand_path(ARGV[5])
 EXPORTED_FUNCTIONS_FILE = File.expand_path(ARGV[6])
+MRUBY_BUILD_DIR = File.expand_path(ARGV[7])
 
 DIRECTORY_MAP = {
   'js/lib' => JS_LIB_FILE,
@@ -106,22 +107,18 @@ module MRuby
         gemdir = "#{root}/mrbgems/#{params[:core]}"
       elsif params[:git]
         url = params[:git]
-        gemdir = "build/mrbgems/#{url.match(/([-\w]+)(\.[-\w]+|)$/).to_a[1]}"
-        return gemdir if File.exists?(gemdir)
-
-        options = [params[:options]] || []
-        options << "--branch \"#{params[:branch]}\"" if params[:branch]
-
-        FileUtils.mkdir_p "build/mrbgems"
-        git.run_clone gemdir, url, options
+        gemdir = "#{MRUBY_BUILD_DIR}/mrbgems/#{url.match(/([-\w]+)(\.[-\w]+|)$/).to_a[1]}"
       else
         fail "unknown gem option #{params}"
       end
 
+      puts "Load gem: #{gemdir}"
       gemdir
     end
   end
 end
+
+puts "Gems #{$gems}"
 
 FileUtils.cd(MRUBY_DIR) do
   load CONFIG_FILE
