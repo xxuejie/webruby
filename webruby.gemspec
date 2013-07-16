@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
   s.files = Dir['lib/**/*']
   s.files += Dir['driver/**/*']
   s.files += Dir['scripts/**/*']
+  s.files += Dir['templates/**/*']
   s.files += Dir['modules/**/*'].reject do |f|
     f['modules/emscripten/tests'] ||
     f['modules/emscripten/demos'] ||
