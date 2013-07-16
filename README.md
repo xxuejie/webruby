@@ -1,9 +1,3 @@
-# `GEM` branch
-
-I'm now working to make `webruby` a command-line based gem. You can use this gem to create a new project, build and run the final JS file. This helps us avoid relying on an `app` folder which would mess up the git staging area.
-
-Now this is maintained in a separate branch since it is under heavy development, the APIs can be changed dramastically within hours. I will merge this to the master branch once I think it is stable.
-
 # Introduction
 
 This project brings mruby to the browser. It uses [emscripten]
