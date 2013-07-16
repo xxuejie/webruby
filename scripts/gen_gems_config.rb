@@ -78,6 +78,9 @@ module MRuby
       # This is also for preventing errors
     end
 
+    def build_dir=(dir)
+    end
+
     def gembox(gemboxfile)
       gembox = File.expand_path("#{gemboxfile}.gembox", "#{root}/mrbgems")
       fail "Can't find gembox '#{gembox}'" unless File.exists?(gembox)
