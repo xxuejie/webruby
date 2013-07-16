@@ -42,8 +42,3 @@ desc "mruby test library"
 task :libmruby_test => Webruby.build_config do |t|
   sh "cd #{MRUBY_DIR} && MRUBY_CONFIG=#{Webruby.full_build_config} ./minirake #{Webruby.full_build_dir}/#{MRBTEST}"
 end
-
-desc "clean mruby library"
-task :libmruby_clean => Webruby.build_config do |t|
-  sh "cd #{MRUBY_DIR} && MRUBY_CONFIG=#{Webruby.full_build_config} ./minirake clean"
-end

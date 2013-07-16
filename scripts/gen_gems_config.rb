@@ -112,13 +112,10 @@ module MRuby
         fail "unknown gem option #{params}"
       end
 
-      puts "Load gem: #{gemdir}"
       gemdir
     end
   end
 end
-
-puts "Gems #{$gems}"
 
 FileUtils.cd(MRUBY_DIR) do
   load CONFIG_FILE

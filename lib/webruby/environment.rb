@@ -5,6 +5,11 @@ MRUBY_DIR = File.join(BASE_DIR, %w[modules mruby])
 DRIVER_DIR = File.join(BASE_DIR, %w[driver])
 SCRIPTS_DIR = File.join(BASE_DIR, %w[scripts])
 
+# for compatibility with mruby
+def root
+  MRUBY_DIR
+end
+
 EMCC = File.join(EMSCRIPTEN_DIR, 'emcc')
 EMLD = File.join(EMSCRIPTEN_DIR, 'emcc')
 EMAR = File.join(EMSCRIPTEN_DIR, 'emar')

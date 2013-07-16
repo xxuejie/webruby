@@ -1,14 +1,14 @@
 module Webruby
   class Config
-    attr_accessor :entrypoint, :build_dir, :gemboxes, :gems,
+    attr_accessor :entrypoint, :build_dir, :selected_gemboxes, :selected_gems,
                   :compile_mode, :loading_mode, :output_name,
                   :executable_output_name
 
     def initialize
       @entrypoint = 'app/app.rb'
       @build_dir = 'build'
-      @gemboxes = ['default']
-      @gems = []
+      @selected_gemboxes = ['default']
+      @selected_gems = []
       @compile_mode = 'debug'   # debug or release
       @loading_mode = 2
       @output_name = 'webruby.js'
@@ -31,12 +31,20 @@ module Webruby
       is_release_mode ? "-O2" : "-O0"
     end
 
+    def gem(g)
+      selected_gems << g
+    end
+
+    def gembox(gb)
+      selected_gemboxes << gb
+    end
+
     def gembox_lines
-      generate_conf_lines(gemboxes, 'gembox')
+      generate_conf_lines(selected_gemboxes, 'gembox')
     end
 
     def gem_lines
-      generate_conf_lines(gems, 'gem')
+      generate_conf_lines(selected_gems, 'gem')
     end
 
     private
