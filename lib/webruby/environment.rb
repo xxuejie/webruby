@@ -33,3 +33,14 @@ ENV['EMSCRIPTEN'] = EMSCRIPTEN_DIR
 
 # TODO: change this to a gem dependency
 MRUBYMIX = File.join(BASE_DIR, %w[modules mrubymix bin mrubymix])
+
+unless File.exists?(File.join(Dir.home, ".emscripten"))
+  puts <<__EOF__
+WARNING: We found out that you have never run emscripten before, since
+emscripten needs a little configuration, we will run emcc here once and
+exit. Please follow the instructions given by emcc. When it is finished,
+please re-run rake.
+__EOF__
+
+  exec(EMCC)
+end
