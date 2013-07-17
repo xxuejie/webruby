@@ -23,5 +23,5 @@ Gem::Specification.new do |s|
     f['modules/emscripten/docs']
   end
   # For emscripten check_engine
-  s.files       += 'modules/emscripten/tests/hello_world.js'
+  s.files       += ['modules/emscripten/tests/hello_world.js']
 end
