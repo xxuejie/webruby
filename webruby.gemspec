@@ -22,4 +22,6 @@ Gem::Specification.new do |s|
     f['modules/emscripten/demos'] ||
     f['modules/emscripten/docs']
   end
+  # For emscripten check_engine
+  s.files       += 'modules/emscripten/tests/hello_world.js'
 end
