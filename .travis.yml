@@ -3,6 +3,8 @@ before_install:
   - sudo add-apt-repository ppa:h-rayflood/llvm -y
   - sudo apt-get update -y
   - sudo apt-get install llvm-3.2 clang-3.2 bison gperf -y
+  # Lets emcc sets up the environment
+  - ./modules/emscripten/emcc
   - gem build webruby.gemspec
   - gem install --no-ri --no-rdoc ./webruby-0.1.0.gem
   - webruby new SampleProject
