@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+# %% -*- ruby -*-
+
+require 'fileutils'
+
+def show_help_and_exit!
+  puts <<END
+webruby: compile your favourite Ruby source code for the browser!
+
+Usage:
+  webruby new [destination path]
+
+  Create a new webruby project using provided skeleton
+END
+  exit 0
+end
+
+def prompt(*args)
+  print(*args)
+  str = gets.strip.downcase
+  str == "yes" || str == "y"
+end
+
+if (ARGV.length == 2) &&
+    (ARGV[0] == 'new')
+  if Dir.exist?(ARGV[1])
+    exit 1 unless prompt("Directory #{ARGV[1]} already exists, do you really want to use this path? ")
+  end
+
+  FileUtils.mkdir_p(ARGV[1])
+  MINIMAL_TEMPLATE_ROOT = File.join(File.dirname(__FILE__),
+                                    %w[.. templates minimal])
+  FileUtils.cp_r("#{MINIMAL_TEMPLATE_ROOT}/.", ARGV[1])
+else
+  show_help_and_exit!
+end
