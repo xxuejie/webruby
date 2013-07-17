@@ -17,7 +17,7 @@ end
 
 def prompt(*args)
   print(*args)
-  str = gets.strip.downcase
+  str = STDIN.gets.strip.downcase
   str == "yes" || str == "y"
 end
 
