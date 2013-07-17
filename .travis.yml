@@ -6,7 +6,7 @@ before_install:
   # Lets emcc sets up the environment
   - ./modules/emscripten/emcc
   - gem build webruby.gemspec
-  - gem install --no-ri --no-rdoc ./webruby-0.1.0.gem
+  - gem install --no-ri --no-rdoc ./webruby-0.1.1.gem
   - webruby new SampleProject
   # Just copy-paste version of fix from https://github.com/travis-ci/travis-cookbooks/issues/155
   - sudo rm -rf /dev/shm && sudo ln -s /run/shm /dev/shm
