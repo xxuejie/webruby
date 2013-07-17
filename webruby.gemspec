@@ -14,7 +14,6 @@ Gem::Specification.new do |s|
 
   s.files       =  Dir['lib/**/*']
   s.files       += Dir['bin/**/*']
-  s.files       += Dir['config/**/*']
   s.files       += Dir['driver/**/*']
   s.files       += Dir['scripts/**/*']
   s.files       += Dir['templates/**/*']
