@@ -28,8 +28,8 @@ MRBC = "mruby/host/bin/mrbc"
 # mruby build, we have to resort to the old i386 triple.
 ENV['EMCC_LLVM_TARGET'] = 'i386-pc-linux-gnu'
 
-# Use customized emscripten config file
-ENV['EM_CONFIG'] = File.join(BASE_DIR, %w[config emscripten.py])
+# Use our emscripten directory
+ENV['EMSCRIPTEN'] = EMSCRIPTEN_DIR
 
 # TODO: change this to a gem dependency
 MRUBYMIX = File.join(BASE_DIR, %w[modules mrubymix bin mrubymix])
