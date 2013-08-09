@@ -65,7 +65,11 @@ module MRuby
   end
 
   class CrossBuild
+    attr_accessor :gem_clone_dir
+
     def initialize(name, &block)
+      @gem_clone_dir = "#{root}/build/mrbgems"
+
       if name == "emscripten"
         instance_eval(&block)
       end
@@ -107,7 +111,7 @@ module MRuby
         gemdir = "#{root}/mrbgems/#{params[:core]}"
       elsif params[:git]
         url = params[:git]
-        gemdir = "#{MRUBY_BUILD_DIR}/mrbgems/#{url.match(/([-\w]+)(\.[-\w]+|)$/).to_a[1]}"
+        gemdir = "#{gem_clone_dir}/#{url.match(/([-\w]+)(\.[-\w]+|)$/).to_a[1]}"
       else
         fail "unknown gem option #{params}"
       end

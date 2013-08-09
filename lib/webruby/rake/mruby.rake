@@ -25,6 +25,7 @@ end
 MRuby::CrossBuild.new('emscripten') do |conf|
   toolchain :emscripten
   conf.build_dir = '#{Webruby.full_build_dir}/mruby/emscripten'
+  conf.gem_clone_dir = '#{File.expand_path("~/.webruby/gems")}'
 
   #{Webruby::App.config.gembox_lines}
   #{Webruby::App.config.gem_lines}
