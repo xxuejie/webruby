@@ -11,10 +11,6 @@ Please refer to this [tutorial](http://qiezi.me/2013/01/09/webruby-1-2-3-tutoria
 [![Build Status](https://travis-ci.org/xxuejie/webruby.png)](https://travis-ci.org/xxuejie/webruby)
 [![Build Status](https://drone.io/github.com/xxuejie/webruby/status.png)](https://drone.io/github.com/xxuejie/webruby/latest)
 
-# Waffle State
-
-[![Stories in Ready](http://badge.waffle.io/xxuejie/webruby.png)](http://waffle.io/xxuejie/webruby)
-
 # Notes
 
 Currently this is still a toy project. Though several demos have been created, it hasn't been used in a production environment. Feel free to play with this, but please give it a complete evaluation before using it in your real-world project.
