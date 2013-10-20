@@ -2,7 +2,7 @@ module Webruby
   class Config
     attr_accessor :entrypoint, :build_dir, :selected_gemboxes, :selected_gems,
                   :compile_mode, :loading_mode, :output_name,
-                  :executable_output_name, :append_file
+                  :append_file
 
     def initialize
       @entrypoint = 'app/app.rb'
@@ -12,7 +12,6 @@ module Webruby
       @compile_mode = 'debug'   # debug or release
       @loading_mode = 2
       @output_name = 'webruby.js'
-      @executable_output_name = 'webruby_bin.js'
     end
 
     def is_release_mode

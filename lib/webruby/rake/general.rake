@@ -15,7 +15,6 @@ end
 
 task :default => :js
 task :js => "#{Webruby.build_dir}/#{Webruby::App.config.output_name}"
-task :js_bin => "#{Webruby.build_dir}/#{Webruby::App.config.executable_output_name}"
 
 task :mrbtest => "#{Webruby.build_dir}/mrbtest.js" do |t|
   sh "node #{Webruby.build_dir}/mrbtest.js"
