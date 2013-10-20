@@ -2,7 +2,7 @@ module Webruby
   class Config
     attr_accessor :entrypoint, :build_dir, :selected_gemboxes, :selected_gems,
                   :compile_mode, :loading_mode, :output_name,
-                  :executable_output_name
+                  :executable_output_name, :append_file
 
     def initialize
       @entrypoint = 'app/app.rb'

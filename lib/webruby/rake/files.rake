@@ -27,18 +27,30 @@ file "#{Webruby.build_dir}/app.o" => "#{Webruby.build_dir}/app.c" do |t|
   sh "#{EMCC} #{EMCC_CFLAGS} #{Webruby::App.config.cflags} #{Webruby.build_dir}/app.c -o #{Webruby.build_dir}/app.o"
 end
 
-file "#{Webruby.build_dir}/main.o" => "#{DRIVER_DIR}/main.c" do |t|
+file "#{Webruby.build_dir}/main.o" => ["#{DRIVER_DIR}/main.c",
+                                       "#{Webruby.build_dir}"] do |t|
   sh "#{EMCC} #{EMCC_CFLAGS} #{Webruby::App.config.cflags} #{DRIVER_DIR}/main.c -o #{Webruby.build_dir}/main.o"
 end
 
-file "#{Webruby.build_dir}/#{Webruby::App.config.output_name}" =>
+file "#{Webruby.build_dir}/link.js" =>
   ["#{Webruby.build_dir}/app.o", :libmruby] +
   Webruby.gem_js_files do |t|
   func_arg = Webruby.get_exported_arg("#{Webruby.build_dir}/functions",
                                       Webruby::App.config.loading_mode,
                                       [])
 
-  sh "#{EMLD} #{Webruby.build_dir}/app.o #{Webruby.build_dir}/#{LIBMRUBY} -o #{Webruby.build_dir}/#{Webruby::App.config.output_name} #{Webruby.gem_js_flags} #{func_arg} #{Webruby::App.config.ldflags}"
+  sh "#{EMLD} #{Webruby.build_dir}/app.o #{Webruby.build_dir}/#{LIBMRUBY} -o #{Webruby.build_dir}/link.js #{Webruby.gem_js_flags} #{func_arg} #{Webruby::App.config.ldflags}"
+end
+
+append_file_deps = Webruby::App.config.append_file ?
+    [Webruby::App.config.append_file] : []
+
+file "#{Webruby.build_dir}/#{Webruby::App.config.output_name}" =>
+  ["#{Webruby.build_dir}/link.js"] + append_file_deps do |t|
+  sh "cat #{Webruby.build_dir}/link.js > #{Webruby.build_dir}/#{Webruby::App.config.output_name}"
+  if Webruby::App.config.append_file
+    sh "cat #{Webruby::App.config.append_file} >> #{Webruby.build_dir}/#{Webruby::App.config.output_name}"
+  end
 end
 
 file "#{Webruby.build_dir}/#{Webruby::App.config.executable_output_name}" =>
