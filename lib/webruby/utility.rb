@@ -108,6 +108,8 @@ module Webruby
       functions = functions.concat(custom_functions)
       functions = functions.concat(COMMON_EXPORTED_FUNCTIONS)
 
+      functions << 'webruby_internal_setup'
+
       # WEBRUBY.run is supported by all loading modes
       functions << 'webruby_internal_run'
 

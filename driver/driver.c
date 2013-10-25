@@ -12,6 +12,10 @@
 /* The generated mruby bytecodes are stored in this array */
 extern const uint8_t app_irep[];
 
+#ifdef HAS_REQUIRE
+void mrb_enable_require(mrb_state *mrb);
+#endif
+
 /*
  * Print levels:
  * 0 - Do not print anything
@@ -47,4 +51,12 @@ int webruby_internal_run(mrb_state* mrb, int print_level)
 int webruby_internal_run_source(mrb_state* mrb, const char *s, int print_level)
 {
   return check_and_print_errors(mrb, mrb_load_string(mrb, s), print_level);
+}
+
+int webruby_internal_setup(mrb_state* mrb)
+{
+#ifdef HAS_REQUIRE
+  mrb_enable_require(mrb);
+#endif
+  return 0;
 }

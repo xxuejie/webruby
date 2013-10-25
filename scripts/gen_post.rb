@@ -40,6 +40,7 @@ File.open(OUTPUT_JS_TEMP_FILE, 'w') do |f|
     // Default print level is errors only
     this.print_level = opts.print_level || 1;
     this.mrb = _mrb_open();
+    _webruby_internal_setup(this.mrb);
   };
 
   WEBRUBY.prototype.close = function() {

@@ -17,6 +17,7 @@ EMAR = File.join(EMSCRIPTEN_DIR, 'emar')
 # TODO: maybe change these two to functions?
 SCRIPT_GEN_POST = File.join(SCRIPTS_DIR, "gen_post.rb")
 SCRIPT_GEN_GEMS_CONFIG = File.join(SCRIPTS_DIR, "gen_gems_config.rb")
+SCRIPT_GEN_REQUIRE = File.join(SCRIPTS_DIR, "gen_require.rb")
 
 EMCC_CFLAGS = "-I#{MRUBY_DIR}/include"
 

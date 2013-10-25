@@ -14,6 +14,12 @@ Webruby::App.setup do |conf|
   # Loading mode, see lib/webruby/utility.rb for details
   conf.loading_mode = 2
 
+  # 2 Ruby source processors are available right now:
+  #
+  # :mrubymix - The old one supporting static require
+  # :gen_require - The new one supporting require
+  conf.source_processor = :mrubymix
+
   # By default the final output file name is "webruby.js"
   conf.output_name = 'webruby.js'
 
