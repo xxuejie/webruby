@@ -5,7 +5,8 @@ before_install:
   - sudo apt-get install llvm-3.2 clang-3.2 bison gperf -y
   # Lets emcc sets up the environment
   - gem build webruby.gemspec
-  - gem install --no-ri --no-rdoc ./webruby-0.2.1.gem
+  - mv `ls webruby-*.gem` webruby-latest.gem
+  - gem install --no-ri --no-rdoc ./webruby-latest.gem
   - webruby new SampleProject
   # Just copy-paste version of fix from https://github.com/travis-ci/travis-cookbooks/issues/155
   - sudo rm -rf /dev/shm && sudo ln -s /run/shm /dev/shm
