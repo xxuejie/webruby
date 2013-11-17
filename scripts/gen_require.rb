@@ -72,6 +72,7 @@ RUBY_SOURCE_PATH = "#{OUTPUT_PATH}.tmp"
 File.open(RUBY_SOURCE_PATH, "w") do |f|
   f.puts <<END
 module Kernel
+  @@REQUIRED_PATH = ""
   @@REQUIRED_MODULES = {
 END
 
@@ -84,9 +85,26 @@ END
 
   def require(name)
     return false unless @@REQUIRED_MODULES.include?(name)
+    @@REQUIRED_PATH = name[0, name.rindex('/') || 0]
     require_internal(@@REQUIRED_MODULES[name])
     @@REQUIRED_MODULES.delete(name)
     true
+  end
+
+  def require_relative(path)
+    current_path = @@REQUIRED_PATH
+    path.split('/').each do |fragment|
+      case fragment
+      when '.'
+        # Doing nothing, current path
+      when '..'
+         current_path = current_path[0, current_path.rindex('/') || 0]
+      else
+        current_path = current_path.empty? ? fragment :
+          "\#{current_path}/\#{fragment}"
+      end
+    end
+    require(current_path)
   end
 end
 END
