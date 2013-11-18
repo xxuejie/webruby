@@ -20,7 +20,7 @@ module Webruby
     end
 
     def cflags
-      "-Wall -Werror-implicit-function-declaration -Wno-warn-absolute-paths #{optimization_flag}"
+      "-Wall -Werror-implicit-function-declaration -Wno-warn-absolute-paths #{optimization_flag} "
     end
 
     def ldflags
