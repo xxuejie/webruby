@@ -15,7 +15,7 @@ MRuby::Toolchain.new(:emscripten) do |conf|
 
   conf.cc do |cc|
     cc.command = '#{EMCC}'
-    cc.flags = '#{Webruby::App.config.cflags}'
+    cc.flags << '#{Webruby::App.config.cflags}'
   end
 
   conf.linker.command = '#{EMLD}'
