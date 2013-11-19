@@ -24,7 +24,7 @@ Currently this is still a toy project. Though several demos have been created, i
 # Demos
 
 * [webruby irb](http://joshnuss.github.io/mruby-web-irb/) - A nice-looking full-fledged webruby irb. Thanks to @joshnuss for his work!
-* [Webruby tutorial](http://qiezi.me/projects/webruby-tutorial/) - minimal example of webruby project, a full description is at [here](http://qiezi.me/2013/01/09/webruby-1-2-3-tutorial/)
+* [Webruby tutorial](http://qiezi.me/projects/webruby-tutorial/) - minimal example of webruby project, a full description is at [here](http://blog.qiezi.me/posts/84789-webruby-1-2-3-tutorial)
 * [mruby](http://qiezi.me/projects/mruby-web-irb/mruby.html) - This is only a minimal demo of web irb, if you want to try out mruby in a browser, I strongly suggest the demo above.
 * [geometries](http://qiezi.me/projects/webgl/geometries.html) - a WebGL example using webruby, [mruby-js](https://github.com/xxuejie/mruby-js) and [three.js](https://github.com/mrdoob/three.js/). **NOTE**: from a practical point of view, I agree that this can be easily implemented using JS. However, this demo shows how easy it is to interact with the JavaScript environment using Ruby.
 
