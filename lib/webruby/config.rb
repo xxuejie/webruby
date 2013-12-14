@@ -16,15 +16,15 @@ module Webruby
     end
 
     def is_release_mode
-      @compile_mode == 'release'
+      compile_mode == 'release'
     end
 
     def cflags
-      "-Wall -Werror-implicit-function-declaration -Wno-warn-absolute-paths #{optimization_flag}"
+      %w(-Wall -Werror-implicit-function-declaration -Wno-warn-absolute-paths) + [optimization_flag]
     end
 
     def ldflags
-      optimization_flag
+      [optimization_flag]
     end
 
     def optimization_flag

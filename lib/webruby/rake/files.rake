@@ -28,7 +28,7 @@ end
 
 file "#{Webruby.build_dir}/app.o" => "#{Webruby.build_dir}/app.c" do |t|
   require_flag = (Webruby::App.config.source_processor == :gen_require) ? ("-DHAS_REQUIRE") : ("")
-  sh "#{EMCC} #{EMCC_CFLAGS} #{require_flag} #{Webruby::App.config.cflags} #{Webruby.build_dir}/app.c -o #{Webruby.build_dir}/app.o"
+  sh "#{EMCC} #{EMCC_CFLAGS} #{require_flag} #{Webruby::App.config.cflags.join(' ')} #{Webruby.build_dir}/app.c -o #{Webruby.build_dir}/app.o"
 end
 
 file "#{Webruby.build_dir}/link.js" =>
@@ -38,7 +38,7 @@ file "#{Webruby.build_dir}/link.js" =>
                                       Webruby::App.config.loading_mode,
                                       [])
 
-  sh "#{EMLD} #{Webruby.build_dir}/app.o #{Webruby.build_dir}/#{LIBMRUBY} -o #{Webruby.build_dir}/link.js #{Webruby.gem_js_flags} #{func_arg} #{Webruby::App.config.ldflags}"
+  sh "#{EMLD} #{Webruby.build_dir}/app.o #{Webruby.build_dir}/#{LIBMRUBY} -o #{Webruby.build_dir}/link.js #{Webruby.gem_js_flags} #{func_arg} #{Webruby::App.config.ldflags.join(' ')}"
 end
 
 append_file_deps = Webruby::App.config.append_file ?
@@ -62,5 +62,5 @@ file "#{Webruby.build_dir}/mrbtest.js" =>
   func_arg = Webruby.get_exported_arg("#{Webruby.build_dir}/functions",
                                       0, ['main'])
 
-  sh "#{EMLD} #{Webruby.build_dir}/mrbtest.bc -o #{Webruby.build_dir}/mrbtest.js -s TOTAL_MEMORY=33554432 #{Webruby.gem_test_js_flags} #{func_arg} #{Webruby::App.config.ldflags}"
+  sh "#{EMLD} #{Webruby.build_dir}/mrbtest.bc -o #{Webruby.build_dir}/mrbtest.js -s TOTAL_MEMORY=33554432 #{Webruby.gem_test_js_flags} #{func_arg} #{Webruby::App.config.ldflags.join(' ')}"
 end
