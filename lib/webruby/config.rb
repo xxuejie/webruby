@@ -2,7 +2,7 @@ module Webruby
   class Config
     attr_accessor :entrypoint, :build_dir, :selected_gemboxes, :selected_gems,
                   :compile_mode, :loading_mode, :output_name,
-                  :append_file, :source_processor
+                  :append_file, :source_processor, :cflags, :ldflags
 
     def initialize
       @entrypoint = 'app/app.rb'
@@ -13,18 +13,12 @@ module Webruby
       @loading_mode = 2
       @output_name = 'webruby.js'
       @source_processor = :mrubymix
+      @cflags = %w(-Wall -Werror-implicit-function-declaration -Wno-warn-absolute-paths) + [optimization_flag]
+      @ldflags = [optimization_flag]
     end
 
     def is_release_mode
       compile_mode == 'release'
-    end
-
-    def cflags
-      %w(-Wall -Werror-implicit-function-declaration -Wno-warn-absolute-paths) + [optimization_flag]
-    end
-
-    def ldflags
-      [optimization_flag]
     end
 
     def optimization_flag
