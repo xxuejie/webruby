@@ -21,6 +21,13 @@ Currently this is still a toy project. Though several demos have been created, i
 
     $ sudo ln -s /usr/bin/python /usr/bin/python2
 
+# Running in Cygwin environment
+
+Thanks to the help from @Akashic1, we can now bulid webruby in Windows, using Cygwin. Besides python, ruby and node.js implementations, only 2 dependencies are needed:
+
+* bison for Windows: <http://gnuwin32.sourceforge.net/packages/bison.htm>
+* emscripten SDK for Windows: <https://github.com/kripken/emscripten/wiki/Emscripten-SDK>
+
 # Demos
 
 * [webruby irb](http://joshnuss.github.io/mruby-web-irb/) - A nice-looking full-fledged webruby irb. Thanks to @joshnuss for his work!
