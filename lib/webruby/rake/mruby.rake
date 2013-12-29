@@ -36,10 +36,12 @@ end
 
 desc "build mruby library"
 task :libmruby => Webruby.build_config do |t|
-  sh "cd #{MRUBY_DIR} && MRUBY_CONFIG=#{Webruby.full_build_config} ./minirake #{Webruby.full_build_dir}/#{LIBMRUBY}"
+  ENV["MRUBY_CONFIG"] = Webruby.full_build_config
+  sh "cd #{MRUBY_DIR} && ruby ./minirake #{Webruby.full_build_dir}/#{LIBMRUBY}"
 end
 
 desc "mruby test library"
 task :libmruby_test => Webruby.build_config do |t|
-  sh "cd #{MRUBY_DIR} && MRUBY_CONFIG=#{Webruby.full_build_config} ./minirake #{Webruby.full_build_dir}/#{MRBTEST}"
+  ENV["MRUBY_CONFIG"] = Webruby.full_build_config
+  sh "cd #{MRUBY_DIR} && ruby ./minirake #{Webruby.full_build_dir}/#{MRBTEST}"
 end

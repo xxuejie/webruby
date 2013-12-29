@@ -45,3 +45,7 @@ __EOF__
 
   exec(EMCC)
 end
+
+if `uname -a`.downcase.index("cygwin")
+  ENV['CYGWIN'] = 'nodosfilewarning'
+end

@@ -13,7 +13,8 @@ file "#{Webruby.build_dir}/rbcode.c" => [Webruby.entrypoint_file,
                                          Webruby.build_dir] +
   Webruby.rb_files do |t|
   if Webruby::App.config.source_processor == :gen_require
-    sh "MRBC=#{Webruby.full_build_dir}/#{MRBC} ruby #{SCRIPT_GEN_REQUIRE} #{File.expand_path(Webruby.entrypoint_file)} #{Webruby.full_build_dir}/rbcode.c"
+    ENV["MRBC"] = "#{Webruby.full_build_dir}/#{MRBC}"
+    sh "ruby #{SCRIPT_GEN_REQUIRE} #{File.expand_path(Webruby.entrypoint_file)} #{Webruby.full_build_dir}/rbcode.c"
   else
     sh "ruby #{MRUBYMIX} #{Webruby.entrypoint_file} #{Webruby.build_dir}/rbcode.rb"
     sh "#{Webruby.build_dir}/#{MRBC} -Bapp_irep -o#{Webruby.build_dir}/rbcode.c #{Webruby.build_dir}/rbcode.rb"
