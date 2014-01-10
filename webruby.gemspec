@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        =  'webruby'
-  s.version     =  '0.2.5'
-  s.date        =  '2013-12-29'
+  s.version     =  '0.2.6'
+  s.date        =  '2014-01-10'
   s.summary     =  'webruby'
   s.description =  'compile your favourite Ruby source code for the browser!'
   s.author      =  'Xuejie Xiao'
