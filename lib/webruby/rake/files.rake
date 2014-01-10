@@ -49,6 +49,7 @@ file "#{Webruby.build_dir}/#{Webruby::App.config.output_name}" =>
   ["#{Webruby.build_dir}/link.js"] + append_file_deps do |t|
   sh "cat #{Webruby.build_dir}/link.js > #{Webruby.build_dir}/#{Webruby::App.config.output_name}"
   if Webruby::App.config.append_file
+    sh "echo '' >> #{Webruby.build_dir}/#{Webruby::App.config.output_name}"
     sh "cat #{Webruby::App.config.append_file} >> #{Webruby.build_dir}/#{Webruby::App.config.output_name}"
   end
 end
