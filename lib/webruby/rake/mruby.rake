@@ -43,5 +43,5 @@ end
 desc "mruby test library"
 task :libmruby_test => Webruby.build_config do |t|
   ENV["MRUBY_CONFIG"] = Webruby.full_build_config
-  sh "cd #{MRUBY_DIR} && ruby ./minirake #{Webruby.full_build_dir}/#{MRBTEST}"
+  sh "cd #{MRUBY_DIR} && ruby ./minirake #{Webruby.full_build_dir}/#{LIBMRUBY} #{Webruby.full_build_dir}/#{MRBTEST}"
 end
