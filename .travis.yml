@@ -10,4 +10,4 @@ before_install:
   - webruby new SampleProject
   # Just copy-paste version of fix from https://github.com/travis-ci/travis-cookbooks/issues/155
   - sudo rm -rf /dev/shm && sudo ln -s /run/shm /dev/shm
-script: "cd SampleProject && rake && rake mrbtest"
+script: "cd SampleProject && rake && rake && rake mrbtest"
