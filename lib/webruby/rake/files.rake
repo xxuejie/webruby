@@ -11,7 +11,7 @@ end
 file "#{Webruby.build_dir}/rbcode.c" => [Webruby.entrypoint_file,
                                          :libmruby,
                                          Webruby.build_dir] +
-  Webruby.rb_files do |t|
+                                        Webruby.rb_files do |t|
   if Webruby::App.config.source_processor == :gen_require
     ENV["MRBC"] = "#{Webruby.full_build_dir}/#{MRBC}"
     sh "ruby #{SCRIPT_GEN_REQUIRE} #{File.expand_path(Webruby.entrypoint_file)} #{Webruby.full_build_dir}/rbcode.c"
