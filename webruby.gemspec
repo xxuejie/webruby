@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        =  'webruby'
-  s.version     =  '0.2.6'
+  s.version     =  '0.2.7'
   s.date        =  '2014-01-10'
   s.summary     =  'webruby'
   s.description =  'compile your favourite Ruby source code for the browser!'
