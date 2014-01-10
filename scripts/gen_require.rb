@@ -84,7 +84,8 @@ END
   }
 
   def require(name)
-    return false unless @@REQUIRED_MODULES.include?(name)
+    name = lookup_module(name)
+    return false unless name
     @@REQUIRED_PATH = name[0, name.rindex('/') || 0]
     require_internal(@@REQUIRED_MODULES[name])
     @@REQUIRED_MODULES.delete(name)
@@ -105,6 +106,16 @@ END
       end
     end
     require(current_path)
+  end
+
+  private
+  def lookup_module(name)
+    return name if @@REQUIRED_MODULES.include?(name)
+    if name.end_with?('.rb')
+      stripped_name = name[0..-4]
+      return stripped_name if @@REQUIRED_MODULES.include?(stripped_name)
+    end
+    return nil
   end
 end
 END
