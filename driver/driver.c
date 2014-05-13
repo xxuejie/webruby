@@ -62,13 +62,13 @@ int webruby_internal_compile(mrb_state* mrb, const char *file_name, const char *
 
 	mrb_value result = mrb_load_string_cxt(mrb, code, cxt);
 
-    mrbc_context_free(mrb, cxt);
+	mrbc_context_free(mrb, cxt);
 
-    FILE* file = fopen(file_name, "wb");
+	FILE* file = fopen(file_name, "wb");
 
 	mrb_dump_irep_binary(mrb, mrb_proc_ptr(result)->body.irep, 0, file);
 
-    fclose(file);
+	fclose(file);
 
 	return 1; 
 }
