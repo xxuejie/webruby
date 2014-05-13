@@ -53,6 +53,28 @@ int webruby_internal_run_source(mrb_state* mrb, const char *s, int print_level)
   return check_and_print_errors(mrb, mrb_load_string(mrb, s), print_level);
 }
 
+int webruby_internal_compile(mrb_state* mrb, const char *file_name, const char *code, int print_level)
+{
+	size_t bin_size = 0;
+
+	mrbc_context *cxt = mrbc_context_new(mrb);
+	cxt->no_exec = 1;
+
+    int index = mrb->irep_len;
+
+	mrb_load_string_cxt(mrb, code, cxt);
+
+    mrbc_context_free(mrb, cxt);
+
+    FILE* file = fopen(file_name, "wb");
+
+	mrb_dump_irep_binary(mrb, 1, 0, file);
+
+    fclose(file);
+
+	return 1;
+}
+
 int webruby_internal_setup(mrb_state* mrb)
 {
 #ifdef HAS_REQUIRE
