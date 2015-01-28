@@ -32,37 +32,21 @@ file "#{Webruby.build_dir}/app.o" => "#{Webruby.build_dir}/app.c" do |t|
   sh "#{EMCC} #{EMCC_CFLAGS} #{require_flag} #{Webruby::App.config.cflags.join(' ')} #{Webruby.build_dir}/app.c -o #{Webruby.build_dir}/app.o"
 end
 
-file "#{Webruby.build_dir}/link.js" =>
-  ["#{Webruby.build_dir}/app.o", :libmruby] +
-  Webruby.gem_js_files do |t|
+file "#{Webruby.build_dir}/#{Webruby::App.config.output_name}" =>
+     ["#{Webruby.build_dir}/app.o", :libmruby] + Webruby.gem_js_files do |t|
   func_arg = Webruby.get_exported_arg("#{Webruby.build_dir}/functions",
                                       Webruby::App.config.loading_mode,
                                       [])
+  runner_arg = Webruby::App.config.append_file ? "--post-js #{Webruby::App.config.append_file}" : ""
 
-  sh "#{EMLD} #{Webruby.build_dir}/app.o #{Webruby.build_dir}/#{LIBMRUBY} #{Webruby::App.config.static_libs.join(' ')} -o #{Webruby.build_dir}/link.js #{Webruby.gem_js_flags} #{func_arg} #{Webruby::App.config.ldflags.join(' ')} #{Webruby::App.config.optimization_flag}"
-end
-
-append_file_deps = Webruby::App.config.append_file ?
-    [Webruby::App.config.append_file] : []
-
-file "#{Webruby.build_dir}/#{Webruby::App.config.output_name}" =>
-  ["#{Webruby.build_dir}/link.js"] + append_file_deps do |t|
-  sh "cat #{Webruby.build_dir}/link.js > #{Webruby.build_dir}/#{Webruby::App.config.output_name}"
-  if Webruby::App.config.append_file
-    sh "echo '' >> #{Webruby.build_dir}/#{Webruby::App.config.output_name}"
-    sh "cat #{Webruby::App.config.append_file} >> #{Webruby.build_dir}/#{Webruby::App.config.output_name}"
-  end
-end
-
-file "#{Webruby.build_dir}/mrbtest.bc" => :libmruby_test do |t|
-  sh "cp #{Webruby.build_dir}/#{MRBTEST} #{Webruby.build_dir}/mrbtest.bc"
+  sh "#{EMLD} #{Webruby.build_dir}/app.o #{Webruby.object_files.join(' ')} #{Webruby::App.config.static_libs.join(' ')} -o #{Webruby.build_dir}/#{Webruby::App.config.output_name} #{Webruby.gem_js_flags} #{func_arg} #{Webruby::App.config.ldflags.join(' ')} #{Webruby::App.config.optimization_flag} #{runner_arg}"
 end
 
 file "#{Webruby.build_dir}/mrbtest.js" =>
-  ["#{Webruby.build_dir}/mrbtest.bc"] + Webruby.gem_test_js_files do |t|
+  [:libmruby_test] + Webruby.gem_test_js_files do |t|
   # loading mode 0 is necessary for mrbtest
   func_arg = Webruby.get_exported_arg("#{Webruby.build_dir}/functions",
                                       0, ['main'])
 
-  sh "#{EMLD} #{Webruby.build_dir}/mrbtest.bc #{Webruby::App.config.static_libs.join(' ')} -o #{Webruby.build_dir}/mrbtest.js -s TOTAL_MEMORY=33554432 #{Webruby.gem_test_js_flags} #{func_arg} #{Webruby::App.config.ldflags.join(' ')} #{Webruby::App.config.optimization_flag}"
+  sh "#{EMLD} #{Webruby.test_object_files.join(' ')} #{Webruby.object_files.join(' ')} #{Webruby::App.config.static_libs.join(' ')} -o #{Webruby.build_dir}/mrbtest.js -s TOTAL_MEMORY=33554432 #{Webruby.gem_test_js_flags} #{func_arg} #{Webruby::App.config.ldflags.join(' ')} #{Webruby::App.config.optimization_flag}"
 end

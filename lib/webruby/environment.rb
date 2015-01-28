@@ -1,6 +1,5 @@
 BASE_DIR = File.expand_path(File.join(File.dirname(__FILE__),
                                       %w[.. ..]))
-EMSCRIPTEN_DIR = File.join(BASE_DIR, %w[modules emscripten])
 MRUBY_DIR = File.join(BASE_DIR, %w[modules mruby])
 DRIVER_DIR = File.join(BASE_DIR, %w[driver])
 SCRIPTS_DIR = File.join(BASE_DIR, %w[scripts])
@@ -10,7 +9,31 @@ def root
   MRUBY_DIR
 end
 
+EMSCRIPTEN_DIR = ENV["EMSCRIPTEN"]
+unless EMSCRIPTEN_DIR
+  # Read ~/.emscripten if needed
+  if File.exists?("~/.emscripten")
+    File.read("~/.emscripten").each do |line|
+      m = line.match(/EMSCRIPTEN_ROOT='([^']+)'/)
+      if m
+        EMSCRIPTEN_DIR = m[1]
+      end
+    end
+    ENV["EMSCRIPTEN"] = EMSCRIPTEN_DIR
+  end
+end
+
+unless EMSCRIPTEN_DIR && EMSCRIPTEN_DIR.length > 0
+  puts <<__EOF__
+WARNING: We found out that you have not configured emscripten. Please
+install emsdk followings steps at http://kripken.github.io/emscripten-site/
+and rerun this command later.
+__EOF__
+  exit(1)
+end
+
 EMCC = File.join(EMSCRIPTEN_DIR, 'emcc')
+EMXX = File.join(EMSCRIPTEN_DIR, 'em++')
 EMLD = File.join(EMSCRIPTEN_DIR, 'emcc')
 EMAR = File.join(EMSCRIPTEN_DIR, 'emar')
 
@@ -24,13 +47,6 @@ EMCC_CFLAGS = "-I#{MRUBY_DIR}/include"
 LIBMRUBY = "mruby/emscripten/lib/libmruby.a"
 MRBTEST = "mruby/emscripten/test/mrbtest"
 MRBC = "mruby/host/bin/mrbc"
-
-# the new le32-unknown-nacl triple has a limitation which will break
-# mruby build, we have to resort to the old i386 triple.
-ENV['EMCC_LLVM_TARGET'] = 'i386-pc-linux-gnu'
-
-# Use our emscripten directory
-ENV['EMSCRIPTEN'] = EMSCRIPTEN_DIR
 
 # TODO: change this to a gem dependency
 MRUBYMIX = File.join(BASE_DIR, %w[modules mrubymix bin mrubymix])

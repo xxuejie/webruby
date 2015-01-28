@@ -39,6 +39,20 @@ module Webruby
       Webruby::App.config.entrypoint
     end
 
+    def object_files
+      (Dir.glob("#{full_build_dir}/mruby/emscripten/src/**/*.o") +
+       Dir.glob("#{full_build_dir}/mruby/emscripten/mrblib/**/*.o") +
+       Dir.glob("#{full_build_dir}/mruby/emscripten/mrbgems/**/*.o"))
+        .reject { |f|
+        f.end_with? "gem_test.o"
+      }
+    end
+
+    def test_object_files
+      (Dir.glob("#{full_build_dir}/mruby/emscripten/test/**/*.o") +
+       Dir.glob("#{full_build_dir}/mruby/emscripten/mrbgems/**/gem_test.o"))
+    end
+
     def rb_files
       Dir.glob("#{File.dirname(entrypoint_file)}/**")
     end

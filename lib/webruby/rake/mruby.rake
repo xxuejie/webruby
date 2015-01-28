@@ -18,6 +18,7 @@ MRuby::Toolchain.new(:emscripten) do |conf|
     cc.flags.push(*#{Webruby::App.config.cflags.inspect})
   end
 
+  conf.cxx.command = '#{EMLD}'
   conf.linker.command = '#{EMLD}'
   conf.archiver.command = '#{EMAR}'
 end
