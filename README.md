@@ -4,29 +4,25 @@ This project brings mruby to the browser. It uses [emscripten]
 (https://github.com/kripken/emscripten) to compile the mruby source code into
 JavaScript and runs in the browser.
 
-Please refer to this [tutorial](http://blog.qiezi.me/posts/84789-webruby-1-2-3-tutorial) for how to use webruby.
-
 # Build Status
 
 [![Build Status](https://travis-ci.org/xxuejie/webruby.png)](https://travis-ci.org/xxuejie/webruby)
 [![Build Status](https://drone.io/github.com/xxuejie/webruby/status.png)](https://drone.io/github.com/xxuejie/webruby/latest)
 
+# How to Install
+
+Webruby now depends on [emsdk](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html) to provide emscripten and LLVM infrustructure. To install webruby, following the following steps:
+
+1. Install emsdk following instructions at [here](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html)
+2. Install latest incoming version of emscripten sdk(right now webruby still depends on code from incoming branch of emscripten, once this goes into a release version, we will lock the version for better stability)
+3. Activate latest incoming version
+4. Webruby should be able to pick up the correct version of emscripten from emsdk. If not, feel free to create an issue :)
+
 # Notes
 
-Currently this is still a toy project. Though several demos have been created, it hasn't been used in a production environment. Feel free to play with this, but please give it a complete evaluation before using it in your real-world project.
+Thanks to @scalone and @sadasant, webruby is already used in production: http://rubykaigi.org/2014/presentation/S-ThiagoScalone-DanielRodriguez
 
-**About LLVM**: Currently if you are installing LLVM using `homebrew`, the default version installed is `3.3`. However, `emscripten` only works with `3.2` nowadays. So you may want to go to [here](http://llvm.org/releases/download.html#3.2), download the binary pack for your OS, extracted and define a local environment variable `LLVM` containing the `bin` folder of the extracted files. This will tell `emscripten` to use this version of `LLVM`.
-
-**For Mac users**: The latest version of emscripten uses `python2` as the default python interpreter. If you are using a Mac and rely on the default python. Please add a link from `python` to `python2` before building:
-
-    $ sudo ln -s /usr/bin/python /usr/bin/python2
-
-# Running in Cygwin environment
-
-Thanks to the help from @Akashic1, we can now bulid webruby in Windows, using Cygwin. Besides python, ruby and node.js implementations, only 2 dependencies are needed:
-
-* bison for Windows: <http://gnuwin32.sourceforge.net/packages/bison.htm>
-* emscripten SDK for Windows: <https://github.com/kripken/emscripten/wiki/Emscripten-SDK>
+However, you might still want to give it a full test before using it in production :)
 
 # Demos
 
