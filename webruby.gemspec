@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        =  'webruby'
-  s.version     =  '0.2.7'
-  s.date        =  '2014-01-10'
+  s.version     =  '0.9.1'
+  s.date        =  '2015-01-28'
   s.summary     =  'webruby'
   s.description =  'compile your favourite Ruby source code for the browser!'
   s.author      =  'Xuejie Xiao'
@@ -17,9 +17,5 @@ Gem::Specification.new do |s|
   s.files       += Dir['driver/**/*']
   s.files       += Dir['scripts/**/*']
   s.files       += Dir['templates/**/*']
-  s.files       += Dir['modules/**/*'].reject do |f|
-    f['modules/emscripten/tests'] ||
-    f['modules/emscripten/demos'] ||
-    f['modules/emscripten/docs']
-  end
+  s.files       += Dir['modules/**/*']
 end
