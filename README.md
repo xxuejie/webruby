@@ -7,7 +7,8 @@ JavaScript and runs in the browser.
 # Build Status
 
 [![Build Status](https://travis-ci.org/xxuejie/webruby.png)](https://travis-ci.org/xxuejie/webruby)
-[![Build Status](https://drone.io/github.com/xxuejie/webruby/status.png)](https://drone.io/github.com/xxuejie/webruby/latest)
+
+Failing is due to the fact that we are still waiting on this [commit](https://github.com/kripken/emscripten/commit/45722d8f0a9169f745b4cd9ea2eaf26fd33d65b4) to land in emsdk releases. Don't really want to explode Travis CI server by building the whole LLVM infrastructure on each build -_-
 
 # How to Install
 
