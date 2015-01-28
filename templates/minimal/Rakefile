@@ -11,7 +11,20 @@ Webruby::App.setup do |conf|
   # Use 'release' for O2 mode build, and everything else for O0 mode
   conf.compile_mode = 'debug'
 
-  # Loading mode, see lib/webruby/utility.rb for details
+  # Note that different functions are needed for the 3 different loading methods,
+  # for example, WEBRUBY.run_source requires all the parsing code is present,
+  # while the first 2 modes only requires code for loading bytecodes.
+  # Given these considerations, we allow 3 loading modes in webruby:
+  #
+  # 0 - only WEBRUBY.run is supported
+  # 1 - WEBRUBY.run and WEBRUBY.run_bytecode are supported
+  # 2 - all 3 loading methods are supported
+  #
+  # It may appear that mode 0 and mode 1 requires the same set of functions
+  # since they both load bytecodes, but due to the fact that mode 0 only loads
+  # pre-defined bytecode array, chances are optimizers may perform some tricks
+  # to eliminate parts of the source code for mode 0. Hence we still distinguish
+  # mode 0 from mode 1 here
   conf.loading_mode = 2
 
   # 2 Ruby source processors are available right now:
@@ -36,6 +49,12 @@ Webruby::App.setup do |conf|
   # a `main.c` file to run the code, but now we favor this method
   # instead of the old one.
   # conf.append_file = 'runner.js'
+
+  # We found that if memory init file is used, browsers will hang
+  # for a long time without response. As a result, we disable memory
+  # init file by default. However, you can test this yourself
+  # and re-enable it by commenting/removing the next line.
+  conf.ldflags << "--memory-init-file 0"
 
   # The syntax for adding gems here are kept the same as mruby.
   # Below are a few examples:
