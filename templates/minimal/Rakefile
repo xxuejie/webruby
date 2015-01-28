@@ -8,7 +8,8 @@ Webruby::App.setup do |conf|
   # By default, the build output directory is "build/"
   conf.build_dir = 'build'
 
-  # Use 'release' for O2 mode build, and everything else for O0 mode
+  # Use 'release' for O2 mode build, and everything else for O0 mode.
+  # Or you can also use '-O0', '-O1', '-O2', '-O3', etc. directly
   conf.compile_mode = 'debug'
 
   # Note that different functions are needed for the 3 different loading methods,

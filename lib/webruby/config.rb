@@ -18,12 +18,9 @@ module Webruby
       @static_libs = []
     end
 
-    def is_release_mode
-      compile_mode == 'release'
-    end
-
     def optimization_flag
-      is_release_mode ? "-O2" : "-O0"
+      return compile_mode if compile_mode.start_with? "-"
+      compile_mode == "release" ? "-O2" : "-O0"
     end
 
     def gem(g)

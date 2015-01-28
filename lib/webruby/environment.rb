@@ -9,21 +9,22 @@ def root
   MRUBY_DIR
 end
 
-EMSCRIPTEN_DIR = ENV["EMSCRIPTEN"]
-unless EMSCRIPTEN_DIR
+emscripten_dir = ENV["EMSCRIPTEN"]
+unless emscripten_dir
   # Read ~/.emscripten if needed
-  if File.exists?("~/.emscripten")
-    File.read("~/.emscripten").each do |line|
+  file = File.join(ENV["HOME"], ".emscripten")
+  if File.exists?(file)
+    File.readlines(file).each do |line|
       m = line.match(/EMSCRIPTEN_ROOT='([^']+)'/)
       if m
-        EMSCRIPTEN_DIR = m[1]
+        emscripten_dir = m[1]
       end
     end
-    ENV["EMSCRIPTEN"] = EMSCRIPTEN_DIR
+    ENV["EMSCRIPTEN"] = emscripten_dir
   end
 end
 
-unless EMSCRIPTEN_DIR && EMSCRIPTEN_DIR.length > 0
+unless emscripten_dir && emscripten_dir.length > 0
   puts <<__EOF__
 WARNING: We found out that you have not configured emscripten. Please
 install emsdk followings steps at http://kripken.github.io/emscripten-site/
@@ -32,10 +33,10 @@ __EOF__
   exit(1)
 end
 
-EMCC = File.join(EMSCRIPTEN_DIR, 'emcc')
-EMXX = File.join(EMSCRIPTEN_DIR, 'em++')
-EMLD = File.join(EMSCRIPTEN_DIR, 'emcc')
-EMAR = File.join(EMSCRIPTEN_DIR, 'emar')
+EMCC = File.join(emscripten_dir, 'emcc')
+EMXX = File.join(emscripten_dir, 'em++')
+EMLD = File.join(emscripten_dir, 'emcc')
+EMAR = File.join(emscripten_dir, 'emar')
 
 # TODO: maybe change these two to functions?
 SCRIPT_GEN_POST = File.join(SCRIPTS_DIR, "gen_post.rb")
