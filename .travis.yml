@@ -1,4 +1,7 @@
 before_install:
+  - sudo add-apt-repository -y ppa:george-edison55/cmake-3.x
+  - sudo apt-get update
+  - sudo apt-get install -y cmake
   - wget https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz
   - tar xzf emsdk-portable.tar.gz
   - cd emsdk_portable
