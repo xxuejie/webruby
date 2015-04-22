@@ -1,7 +1,7 @@
 before_install:
-  - wget https://s3.amazonaws.com/biibinaries/thirdparty/cmake-3.0.2-Linux-64.tar.gz
-  - tar -xzf cmake-3.0.2-Linux-64.tar.gz
-  - sudo cp -fR cmake-3.0.2-Linux-64/* /usr
+  - sudo add-apt-repository -yes ppa:kalakris/cmake
+  - sudo apt-get update -qq
+  - sudo apt-get install cmake
   - wget https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz
   - tar xzf emsdk-portable.tar.gz
   - cd emsdk_portable
