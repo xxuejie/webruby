@@ -2,7 +2,7 @@
 
 In fact, I've been thinking about webruby's future: the whole development & debugging flow feels just a nightmare. Sometimes I won't want to work on this myself, so how can I expect others to use this? The tooling support for other projects in this field is so great, that we really can't expect developers would fall in love with this unconditionally.
 
-So right now, I more consider this to be a demonstration of what we can achieve by combining emscripten and mruby. While I will continue to support it when certain bugs arise, I advise you to consider it carefully before using it in production.
+So right now, I more consider this to be a demonstration of what we can achieve by combining emscripten and mruby. If you are using mruby in your stack, and having an in-browser debugging environment might benefit your setup, feel free to use this project either directly or as a starting point. Otherwise, it might be better to consider alternative solutions which are more tooling friendly and lightweight.
 
 # Introduction
 
