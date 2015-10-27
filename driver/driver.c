@@ -50,7 +50,19 @@ int webruby_internal_run(mrb_state* mrb, int print_level)
 
 int webruby_internal_run_source(mrb_state* mrb, const char *s, int print_level)
 {
-  return check_and_print_errors(mrb, mrb_load_string(mrb, s), print_level);
+  mrbc_context *c = NULL;
+  int err;
+
+  if (print_level > 0) {
+    c = mrbc_context_new(mrb);
+    c->dump_result = TRUE;
+  }
+  err = check_and_print_errors(mrb, mrb_load_string_cxt(mrb, s, c),
+                               print_level);
+  if (c) {
+    mrbc_context_free(mrb, c);
+  }
+  return err;
 }
 
 int webruby_internal_setup(mrb_state* mrb)
