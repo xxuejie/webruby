@@ -38,7 +38,10 @@ File.open(OUTPUT_JS_TEMP_FILE, 'w') do |f|
     opts = opts || {};
 
     // Default print level is errors only
-    this.print_level = (opts.print_level >= 0) ? opts.print_level : 1;
+    this.print_level = 1;
+    if (typeof opts.print_level === "number" && opts.print_level >= 0) {
+      this.print_level = opts.print_level;
+    }
     this.mrb = _mrb_open();
     _webruby_internal_setup(this.mrb);
   };
